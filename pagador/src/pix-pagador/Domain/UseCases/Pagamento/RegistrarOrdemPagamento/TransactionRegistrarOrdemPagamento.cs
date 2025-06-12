@@ -1,0 +1,44 @@
+﻿using Domain.Core.Base;
+using Domain.Core.Enum;
+using Domain.Core.Models.JDPI;
+using Domain.Core.Models.Responses;
+using System.Text.Json;
+
+namespace Domain.UseCases.Pagamento.RegistrarOrdemPagamento
+{
+    public record TransactionRegistrarOrdemPagamento : BaseTransaction<BaseReturn<JDPIRegistrarOrdemPagamentoResponse>>
+    {
+        public string idReqSistemaCliente { get; set; }
+        public EnumTpIniciacao tpIniciacao { get; set; }
+        public JDPIDadosContaPagador pagador { get; set; }
+        public JDPIDadosContaRecebedor recebedor { get; set; }
+        public double valor { get; set; }
+        public string chave { get; set; }
+        public string dtEnvioPag { get; set; }
+        public string endToEndId { get; set; }
+        public string idConciliacaoRecebedor { get; set; }
+        public string infEntreClientes { get; set; }
+        public string? cnpjIniciadorPagamento { get; set; }
+        public string? consentId { get; set; }
+        public EnumPrioridadePagamento? prioridadePagamento { get; set; }
+        public EnumTpPrioridadePagamento? tpPrioridadePagamento { get; set; }
+        public EnumTipoFinalidade? finalidade { get; set; }
+        public EnumModalidadeAgente? modalidadeAgente { get; set; }
+        public int? ispbPss { get; set; }
+        public List<JDPIValorDetalhe>? vlrDetalhe { get; set; }
+        public string qrCode { get; set; }
+        public string agendamentoID { get; set; }
+
+
+
+        public TransactionRegistrarOrdemPagamento()
+        {
+            
+        }
+
+        public override string getTransactionSerialization()
+        {
+            return JsonSerializer.Serialize(this);
+        }
+    }
+}
