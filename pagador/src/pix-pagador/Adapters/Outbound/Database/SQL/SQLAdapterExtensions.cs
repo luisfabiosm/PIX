@@ -1,6 +1,4 @@
-﻿using Adapters.Outbound.Database.SQL.Sample;
-using Domain.Core.Interfaces.Outbound;
-using Domain.Core.Models.Entity;
+﻿using Domain.Core.Ports.Outbound;
 using Domain.Core.Settings;
 
 namespace Adapters.Outbound.Database.SQL
@@ -27,7 +25,7 @@ namespace Adapters.Outbound.Database.SQL
 
 
             services.AddScoped<ISQLConnectionAdapter, SQLConnectionAdapter>();
-            services.AddScoped<ISQLSampleRepository, SQLSampleRepository>();
+            services.AddScoped<ISPARepository, SPARepository>();
 
             return services;
 

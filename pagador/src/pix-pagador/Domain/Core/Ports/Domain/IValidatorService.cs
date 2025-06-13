@@ -2,7 +2,7 @@
 using Domain.Core.Exceptions;
 using Domain.Core.Models.JDPI;
 
-namespace Domain.Core.Interfaces.Domain
+namespace Domain.Core.Ports.Domain
 {
     public interface IValidatorService
     {

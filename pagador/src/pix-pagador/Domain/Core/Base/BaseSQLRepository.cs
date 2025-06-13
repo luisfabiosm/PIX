@@ -1,4 +1,4 @@
-﻿using Domain.Core.Interfaces.Outbound;
+﻿using Domain.Core.Ports.Outbound;
 using Domain.Core.Settings;
 using Microsoft.Extensions.Options;
 using System.Data;

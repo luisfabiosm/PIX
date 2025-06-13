@@ -1,5 +1,5 @@
 ﻿using Domain.Core.Exceptions;
-using Domain.Core.Interfaces.Outbound;
+using Domain.Core.Ports.Outbound;
 
 namespace Domain.Core.Base
 {

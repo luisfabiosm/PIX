@@ -2,7 +2,7 @@
 using Domain.Core.Base;
 using Domain.Core.Mediator;
 using Domain.Core.Models.Request;
-using Domain.Core.Models.Responses;
+using Domain.Core.Models.Response;
 using Domain.UseCases.Pagamento.CancelarOrdemPagamento;
 using Domain.UseCases.Pagamento.EfetivarOrdemPagamento;
 using Domain.UseCases.Pagamento.RegistrarOrdemPagamento;

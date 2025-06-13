@@ -1,7 +1,7 @@
 ﻿using Domain.Core.Base;
 using System.Text.Json;
 
-namespace Domain.Core.Models.Responses
+namespace Domain.Core.Models.Response
 {
     public record JDPICancelarOrdemPagamentoResponse : BaseTransactionResponse
     {

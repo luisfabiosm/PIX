@@ -1,6 +1,10 @@
 ﻿
 using Domain.Core.Enum;
 using Domain.Core.Models.Request;
+using Domain.Core.Models.Response;
+using Domain.UseCases.Devolucao.CancelarOrdemDevolucao;
+using Domain.UseCases.Devolucao.EfetivarOrdemDevolucao;
+using Domain.UseCases.Devolucao.RegistrarOrdemDevolucao;
 using Domain.UseCases.Pagamento.CancelarOrdemPagamento;
 using Domain.UseCases.Pagamento.EfetivarOrdemPagamento;
 using Domain.UseCases.Pagamento.RegistrarOrdemPagamento;
@@ -81,13 +85,85 @@ namespace Adapters.Inbound.WebApi.Pix.Mapping
                     agendamentoID = request.agendamentoID,
                     motivo = request.motivo,
                     tipoErro = request.tipoErro
-                }
+                };
             }
             catch (Exception)
             {
                 throw;
             }
         }
+
+
+        public TransactionRegistrarOrdemDevolucao ToTransactionRegistrarOrdemDevolucao(JDPIRequisitarDevolucaoOrdemPagtoRequest request, string correlationId, int code)
+        {
+            try
+            {
+
+                return new TransactionRegistrarOrdemDevolucao
+                {
+                    CorrelationId = correlationId,
+                    Code = code,
+                    idReqSistemaCliente = request.idReqSistemaCliente,
+                    endToEndIdOriginal = request.endToEndIdOriginal,
+                    endToEndIdDevolucao = request.endToEndIdDevolucao,
+                    codigoDevolucao = request.codigoDevolucao,
+                    motivoDevolucao = request.motivoDevolucao,
+                    valorDevolucao = request.valorDevolucao
+
+                };
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+
+        public TransactionEfetivarOrdemDevolucao ToTransactionEfetivarOrdemDevolucao(JDPIEfetivarOrdemDevolucaoRequest request, string correlationId, int code)
+        {
+            try
+            {
+
+                return new TransactionEfetivarOrdemDevolucao
+                {
+                    CorrelationId = correlationId,
+                    Code = code,
+                    idReqSistemaCliente = request.idReqSistemaCliente,
+                    idReqJdPi = request.idReqJdPi,
+                    endToEndIdOriginal = request.endToEndIdOriginal,
+                    endToEndIdDevolucao = request.endToEndIdDevolucao,
+                    dtHrReqJdPi = request.dtHrReqJdPi
+
+                };
+
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+
+        public TransactionCancelarOrdemDevolucao ToTransactionCancelarOrdemDevolucao(JDPICancelarRegistroOrdemdDevolucaoRequest request, string correlationId, int code)
+        {
+            try
+            {
+
+                return new TransactionCancelarOrdemDevolucao
+                {
+                    CorrelationId = correlationId,
+                    Code = code,
+                    idReqSistemaCliente = request.idReqSistemaCliente,
+
+                };
+
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
 
     }
 }
