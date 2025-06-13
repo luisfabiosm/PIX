@@ -2,6 +2,10 @@
 using Domain.Core.Base;
 using Domain.Core.Mediator;
 using Domain.Core.Models.Request;
+using Domain.Core.Models.Response;
+using Domain.UseCases.Devolucao.CancelarOrdemDevolucao;
+using Domain.UseCases.Devolucao.EfetivarOrdemDevolucao;
+using Domain.UseCases.Devolucao.RegistrarOrdemDevolucao;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -18,14 +22,14 @@ namespace Adapters.Inbound.WebApi.Pix.Endpoints
 
 
             group.MapPost("requisitar", async (
-                  [FromBody] JDPICreditoDevolucaoRequest request,
+                  [FromBody] JDPIRequisitarDevolucaoOrdemPagtoRequest request,
                   [FromServices] BSMediator bSMediator,
                   [FromServices] MappingHttpRequestToTransaction mapping
                   ) =>
             {
                       string correlationId = Guid.NewGuid().ToString();
-                      var transaction = mapping.ToTransactionCreditoDevolucao(request, correlationId, 1);
-                      var _result = await bSMediator.Send<TransactionCreditoDevolucao, BaseReturn<JDPICreditoDevolucaoResponse>>(transaction);
+                      var transaction = mapping.ToTransactionRegistrarOrdemDevolucao(request, correlationId, 1);
+                      var _result = await bSMediator.Send<TransactionRegistrarOrdemDevolucao, BaseReturn<JDPIRegistrarOrdemDevolucaoResponse>>(transaction);
 
                       if (!_result.Success)
                           _result.ThrowIfError();
@@ -42,14 +46,14 @@ namespace Adapters.Inbound.WebApi.Pix.Endpoints
 
 
             group.MapPost("cancelar", async (
-                  [FromBody] JDPICancelarRegistroOrdemPagtoRequest request,
+                  [FromBody] JDPICancelarRegistroOrdemdDevolucaoRequest request,
                   [FromServices] BSMediator bSMediator,
                   [FromServices] MappingHttpRequestToTransaction mapping
                   ) =>
             {
                       string correlationId = Guid.NewGuid().ToString();
-                      var transaction = mapping.ToTransactionCancelarOrdemPagamento(request, correlationId, 1);
-                      var _result = await bSMediator.Send<TransactionCancelarOrdemPagamento, BaseReturn<JDPICancelarOrdemPagamentoResponse>>(transaction);
+                      var transaction = mapping.ToTransactionCancelarOrdemDevolucao(request, correlationId, 1);
+                      var _result = await bSMediator.Send<TransactionCancelarOrdemDevolucao, BaseReturn<JDPICancelarOrdemDevolucaoResponse>>(transaction);
 
                       if (!_result.Success)
                           _result.ThrowIfError();
@@ -66,14 +70,14 @@ namespace Adapters.Inbound.WebApi.Pix.Endpoints
 
 
             group.MapPost("efetivar", async (
-                  [FromBody] JDPIEfetivarOrdemPagtoRequest request,
+                  [FromBody] JDPIEfetivarOrdemDevolucaoRequest request,
                   [FromServices] BSMediator bSMediator,
                   [FromServices] MappingHttpRequestToTransaction mapping
                  ) =>
             {
                 string correlationId = Guid.NewGuid().ToString();
-                var transaction = mapping.ToTransactionEfetivarOrdemPagamento(request, correlationId, 1);
-                var _result = await bSMediator.Send<TransactionEfetivarOrdemPagamento, BaseReturn<JDPIEfetivarOrdemPagamentoResponse>>(transaction);
+                var transaction = mapping.ToTransactionEfetivarOrdemDevolucao(request, correlationId, 1);
+                var _result = await bSMediator.Send<TransactionEfetivarOrdemDevolucao, BaseReturn<JDPIEfetivarOrdemDevolucaoResponse>>(transaction);
 
                 if (!_result.Success)
                     _result.ThrowIfError();

@@ -1,5 +1,5 @@
 ﻿using Domain.Core.Base;
-using Domain.Core.Models.Responses;
+using Domain.Core.Models.Response;
 using Domain.UseCases.Pagamento.RegistrarOrdemPagamento;
 
 namespace Domain.UseCases.Pagamento.EfetivarOrdemPagamento

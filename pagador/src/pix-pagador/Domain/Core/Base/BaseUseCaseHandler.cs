@@ -1,7 +1,7 @@
 ﻿using Domain.Core.Exceptions;
-using Domain.Core.Interfaces.Domain;
-using Domain.Core.Interfaces.Outbound;
 using Domain.Core.Mediator;
+using Domain.Core.Ports.Domain;
+using Domain.Core.Ports.Outbound;
 
 namespace Domain.Core.Base
 {

@@ -1,7 +1,7 @@
 ﻿using Domain.Core.Enum;
 using Domain.Core.Exceptions;
-using Domain.Core.Interfaces.Domain;
 using Domain.Core.Models.JDPI;
+using Domain.Core.Ports.Domain;
 
 namespace Domain.Services
 {
@@ -61,6 +61,15 @@ namespace Domain.Services
 
 
         public (List<ErrorDetails> Errors, bool IsValid) ValidarValor(double valor)
+        {
+            var errors = new List<ErrorDetails>();
+
+            ValidateRequired(valor, "valor", errors);
+
+            return (errors, errors.Count == 0);
+        }
+
+        public (List<ErrorDetails> Errors, bool IsValid) ValidarValorDevolucao(double valor)
         {
             var errors = new List<ErrorDetails>();
 

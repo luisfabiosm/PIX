@@ -1,7 +1,6 @@
 ﻿using Adapters.Inbound.WebApi.Middleware;
 using Adapters.Inbound.WebApi.Pix.Endpoints;
-using Adapters.Inbound.WebApi.Sample.Endpoints;
-using Adapters.Inbound.WebApi.Sample.Mapping;
+using Adapters.Inbound.WebApi.Pix.Mapping;
 using Microsoft.OpenApi.Models;
 
 namespace Adapters.Inbound.WebApi.Extensions
@@ -81,7 +80,6 @@ namespace Adapters.Inbound.WebApi.Extensions
 
             app.UseHttpsRedirection();
             app.UseHttpHandlingMiddleware();
-            app.AddDevolucaoEndpoints();
             app.AddOrdemPagamentoEndpoints();
             app.AddDevolucaoEndpoints();
             app.UseAuthentication();

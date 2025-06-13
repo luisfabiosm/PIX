@@ -6,12 +6,12 @@ using Polly;
 using Polly.Retry;
 using System.Data;
 using Dapper;
-using Domain.Core.Interfaces.Outbound;
 
 
 using Microsoft.Data.SqlClient;
 using DbConnection = Microsoft.Data.SqlClient.SqlConnection;
 using DbException = Microsoft.Data.SqlClient.SqlException;
+using Domain.Core.Ports.Outbound;
 
 
 

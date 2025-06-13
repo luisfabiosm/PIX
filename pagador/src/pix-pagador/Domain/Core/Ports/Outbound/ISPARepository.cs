@@ -1,13 +1,11 @@
-﻿
-
-using Domain.UseCases.Devolucao.CancelarOrdemDevolucao;
+﻿using Domain.UseCases.Devolucao.CancelarOrdemDevolucao;
 using Domain.UseCases.Devolucao.EfetivarOrdemDevolucao;
 using Domain.UseCases.Devolucao.RegistrarOrdemDevolucao;
 using Domain.UseCases.Pagamento.CancelarOrdemPagamento;
 using Domain.UseCases.Pagamento.EfetivarOrdemPagamento;
 using Domain.UseCases.Pagamento.RegistrarOrdemPagamento;
 
-namespace Domain.Core.Interfaces.Outbound
+namespace Domain.Core.Ports.Outbound
 {
     public interface ISPARepository : IDisposable
     {

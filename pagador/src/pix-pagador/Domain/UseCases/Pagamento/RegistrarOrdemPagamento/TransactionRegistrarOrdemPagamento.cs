@@ -1,7 +1,7 @@
 ﻿using Domain.Core.Base;
 using Domain.Core.Enum;
 using Domain.Core.Models.JDPI;
-using Domain.Core.Models.Responses;
+using Domain.Core.Models.Response;
 using System.Text.Json;
 
 namespace Domain.UseCases.Pagamento.RegistrarOrdemPagamento
