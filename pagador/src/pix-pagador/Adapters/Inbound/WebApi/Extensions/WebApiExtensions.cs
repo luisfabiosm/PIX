@@ -10,7 +10,8 @@ namespace Adapters.Inbound.WebApi.Extensions
         public static IServiceCollection addWebApiEndpoints(this IServiceCollection services, IConfiguration configuration)
         {
 
-            services.ConfigureHttpJsonOptions(options => {
+            services.ConfigureHttpJsonOptions(options =>
+            {
                 options.SerializerOptions.DefaultIgnoreCondition =
                     System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
             });

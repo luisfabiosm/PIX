@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 namespace Adapters.Outbound.Logging
 {
-    public class NoOpOperationContext: IOperationContext
+    public class NoOpOperationContext : IOperationContext
     {
         public Activity Activity { get; }
 

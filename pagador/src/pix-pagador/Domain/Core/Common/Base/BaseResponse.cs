@@ -1,4 +1,4 @@
-﻿namespace Domain.Core.Base
+﻿namespace Domain.Core.Common.Base
 {
     public class BaseResponse<T>
     {
@@ -23,7 +23,7 @@
             {
                 Success = false,
                 Message = message,
-                ErrorCode = errorCode??-1
+                ErrorCode = errorCode ?? -1
             };
         }
     }

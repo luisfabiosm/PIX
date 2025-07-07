@@ -1,12 +1,10 @@
-﻿using System;
-using System.Reflection;
-using Domain.Core.Ports.Outbound;
+﻿using Domain.Core.Ports.Outbound;
 using Domain.Core.Settings;
-using Microsoft.Extensions.DependencyInjection;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Serilog;
+using System.Reflection;
 
 namespace Adapters.Outbound.Logging
 {

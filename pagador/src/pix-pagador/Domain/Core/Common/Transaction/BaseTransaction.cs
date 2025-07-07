@@ -1,14 +1,12 @@
-﻿
+﻿using Domain.Core.Common.Mediator;
 
-using Domain.Core.Mediator;
-
-namespace Domain.Core.Base
+namespace Domain.Core.Common.Transaction
 {
-    public abstract record BaseTransaction<TResponse> :  IBSRequest<TResponse>
+    public abstract record BaseTransaction<TResponse> : IBSRequest<TResponse>
     {
         public int Code { get; init; }
 
-        public string CorrelationId { get; set; } = Guid.NewGuid().ToString();
+        public string CorrelationId { get; set; } = string.Empty; // Será definido nos endpoints
 
         public int canal { get; set; }
 
@@ -18,7 +16,7 @@ namespace Domain.Core.Base
 
         public BaseTransaction()
         {
-            
+
         }
 
         public abstract string getTransactionSerialization();

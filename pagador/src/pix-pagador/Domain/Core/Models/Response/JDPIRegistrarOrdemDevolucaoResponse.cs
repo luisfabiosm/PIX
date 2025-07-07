@@ -1,5 +1,5 @@
-﻿using Domain.Core.Base;
-using System.Text.Json;
+﻿using Domain.Core.Common.Serialization;
+using Domain.Core.Common.Transaction;
 
 namespace Domain.Core.Models.Response
 {
@@ -9,7 +9,9 @@ namespace Domain.Core.Models.Response
 
         public JDPIRegistrarOrdemDevolucaoResponse(string result)
         {
-            var _result = JsonSerializer.Deserialize<JDPIRegistrarOrdemDevolucaoResponse>(result);
+
+            var _result = result.FromJsonOptimized<JDPIRegistrarOrdemDevolucaoResponse>(JsonOptions.Default);
+            if (_result == null) return;
 
             pixInterno = _result.pixInterno;
 

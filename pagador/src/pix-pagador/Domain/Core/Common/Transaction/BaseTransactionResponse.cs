@@ -1,4 +1,4 @@
-﻿namespace Domain.Core.Base
+﻿namespace Domain.Core.Common.Transaction
 {
     public record BaseTransactionResponse
     {

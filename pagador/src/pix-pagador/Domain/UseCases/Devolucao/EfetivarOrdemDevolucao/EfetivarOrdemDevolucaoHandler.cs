@@ -1,11 +1,11 @@
-﻿using Domain.Core.Base;
-using Domain.Core.Models.Request;
+﻿using Domain.Core.Common.Mediator;
+using Domain.Core.Common.ResultPattern;
+using Domain.Core.Exceptions;
 using Domain.Core.Models.Response;
-using Domain.UseCases.Devolucao.RegistrarOrdemDevolucao;
 
 namespace Domain.UseCases.Devolucao.EfetivarOrdemDevolucao
 {
-    public class EfetivarOrdemDevolucaoHandler : BaseUseCaseHandler<TransactionEfetivarOrdemDevolucao, BaseReturn<JDPIEfetivarOrdemDevolucaoResponse>, JDPIEfetivarOrdemDevolucaoResponse>
+    public class EfetivarOrdemDevolucaoHandler : BSUseCaseHandler<TransactionEfetivarOrdemDevolucao, BaseReturn<JDPIEfetivarOrdemDevolucaoResponse>, JDPIEfetivarOrdemDevolucaoResponse>
     {
 
 
@@ -14,35 +14,37 @@ namespace Domain.UseCases.Devolucao.EfetivarOrdemDevolucao
 
         }
 
-        protected override async Task ValidateTransaction(TransactionEfetivarOrdemDevolucao transaction, CancellationToken cancellationToken)
+
+        protected override async Task<ValidationResult> ExecuteSpecificValidations(TransactionEfetivarOrdemDevolucao transaction, CancellationToken cancellationToken)
         {
-            var _result = _validateService.ValidarIdReqSistemaCliente(transaction.idReqSistemaCliente);
-            if (!_result.IsValid)
-                _validateException.erros.AddRange(_result.Errors);
+            var errors = new List<ErrorDetails>();
+
+            // Validação de idReqSistemaCliente
+            var clienteValidation = _validateService.ValidarIdReqSistemaCliente(transaction.idReqSistemaCliente);
+            if (!clienteValidation.IsValid)
+                errors.AddRange(clienteValidation.Errors);
+
+            var endToEndValidation = _validateService.ValidarEndToEndIdOriginal(transaction.endToEndIdOriginal);
+            if (!endToEndValidation.IsValid)
+                errors.AddRange(endToEndValidation.Errors);
 
 
-            _result = _validateService.ValidarEndToEndId(transaction.endToEndIdOriginal);
-            if (!_result.IsValid)
-                _validateException.erros.AddRange(_result.Errors);
 
-
-            if (_validateException.erros.Count > 0)
-                throw _validateException;
-
+            return errors.Count > 0 ? ValidationResult.Invalid(errors) : ValidationResult.Valid();
         }
+
 
         protected override async Task<JDPIEfetivarOrdemDevolucaoResponse> ExecuteTransactionProcessing(TransactionEfetivarOrdemDevolucao transaction, CancellationToken cancellationToken)
         {
             try
             {
-                var _result = await _spaRepoSql.EfetivarOrdemDevolucao(transaction);
-                var _handleResult = await HandleProcessingResult(_result.result, _result.exception);
-                return new JDPIEfetivarOrdemDevolucaoResponse(_handleResult);
-
+                var result = await _spaRepoSql.EfetivarOrdemDevolucao(transaction);
+                var handledResult = await HandleProcessingResult(result.result, result.exception);
+                return new JDPIEfetivarOrdemDevolucaoResponse(handledResult);
             }
             catch (Exception dbEx)
             {
-                _loggingAdapter.LogError("Database error", dbEx);
+                _loggingAdapter.LogError("Erro de database durante efetivacao de ordem de devolução", dbEx);
                 throw;
             }
         }
@@ -57,10 +59,9 @@ namespace Domain.UseCases.Devolucao.EfetivarOrdemDevolucao
             );
         }
 
-
         protected override BaseReturn<JDPIEfetivarOrdemDevolucaoResponse> ReturnErrorResponse(Exception exception, string correlationId)
         {
-            return new BaseReturn<JDPIEfetivarOrdemDevolucaoResponse>(exception, false, correlationId);
+            return BaseReturn<JDPIEfetivarOrdemDevolucaoResponse>.FromException(exception, correlationId);
         }
 
 
