@@ -1,9 +1,5 @@
-﻿
-
-using Domain.Core.Base;
+﻿using Domain.Core.Common.Base;
 using Domain.Core.Exceptions;
-using System.Net;
-using System.Text.Json;
 
 namespace Adapters.Inbound.WebApi.Middleware
 {
@@ -53,6 +49,10 @@ namespace Adapters.Inbound.WebApi.Middleware
                     StatusCodes.Status400BadRequest,
                     CreateBadRequestResponse(businessEx.Data)
                 ),
+                SPSException spsEx => (
+                 spsEx.ErrorCode,
+                 CreateBadRequestResponse(spsEx.Data)
+             ),
                 InternalException internalEx => (
                     StatusCodes.Status400BadRequest,
                     CreateBadRequestResponse(internalEx.Data)

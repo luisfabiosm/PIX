@@ -1,7 +1,6 @@
-﻿
-using Domain.Core.Enum;
+﻿using Domain.Core.Enum;
 
-namespace Domain.Core.Base
+namespace Domain.Core.Common.Base
 {
     public record BaseError
     {
@@ -14,7 +13,7 @@ namespace Domain.Core.Base
         public BaseError(int code, string mensagem, EnumErrorType type = EnumErrorType.System, string source = null)
         {
             this.code = code;
-            this.message = mensagem;
+            message = mensagem;
             this.source = source;
             this.type = type;
         }

@@ -1,17 +1,14 @@
-﻿
-using Domain.Core.Base;
+﻿using Dapper;
+using Domain.Core.Common.Base;
+using Domain.Core.Ports.Outbound;
 using Domain.Core.Settings;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Options;
 using Polly;
 using Polly.Retry;
 using System.Data;
-using Dapper;
-
-
-using Microsoft.Data.SqlClient;
 using DbConnection = Microsoft.Data.SqlClient.SqlConnection;
 using DbException = Microsoft.Data.SqlClient.SqlException;
-using Domain.Core.Ports.Outbound;
 
 
 
@@ -27,7 +24,7 @@ namespace Adapters.Outbound.Database.SQL
         private string _CorrelationId;
 
 
-        public SQLConnectionAdapter(IServiceProvider serviceProvider) : base (serviceProvider)
+        public SQLConnectionAdapter(IServiceProvider serviceProvider) : base(serviceProvider)
         {
             _settings = serviceProvider.GetRequiredService<IOptions<DBSettings>>();
             _retryPolicy = CreateRetryPolicy();
@@ -152,13 +149,13 @@ namespace Adapters.Outbound.Database.SQL
                     }
                     catch (SqlException ex) when (IsTransientError(ex) && attempt < MaxRetries)
                     {
-                        _loggingAdapter.LogError($"[ExecuteWithRetryAsync] Ocorreu um erro temporário (Tentativas {MaxRetries}): {ex.Message}",ex);
+                        _loggingAdapter.LogError($"[ExecuteWithRetryAsync] Ocorreu um erro temporário (Tentativas {MaxRetries}): {ex.Message}", ex);
                         await Task.Delay(GetDelayMilliseconds(attempt), cancellationToken);
                         await EnsureConnectionClosedAsync();
                     }
                     catch (InvalidOperationException ex) when ((ex.Message.Contains("closed") || ex.Message.Contains("open")) && attempt < MaxRetries)
                     {
-                        _loggingAdapter.LogError("ExecuteWithRetryAsync Conexão fechada inesperadamente",ex);
+                        _loggingAdapter.LogError("ExecuteWithRetryAsync Conexão fechada inesperadamente", ex);
                         await Task.Delay(GetDelayMilliseconds(attempt), cancellationToken);
                         await EnsureConnectionClosedAsync();
                     }

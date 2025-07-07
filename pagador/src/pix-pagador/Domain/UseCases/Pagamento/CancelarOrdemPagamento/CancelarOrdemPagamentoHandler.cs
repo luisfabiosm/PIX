@@ -1,10 +1,11 @@
-﻿using Domain.Core.Base;
+﻿using Domain.Core.Common.Mediator;
+using Domain.Core.Common.ResultPattern;
+using Domain.Core.Exceptions;
 using Domain.Core.Models.Response;
-using Domain.UseCases.Pagamento.EfetivarOrdemPagamento;
 
 namespace Domain.UseCases.Pagamento.CancelarOrdemPagamento
 {
-    public class CancelarOrdemPagamentoHandler : BaseUseCaseHandler<TransactionCancelarOrdemPagamento, BaseReturn<JDPICancelarOrdemPagamentoResponse>, JDPICancelarOrdemPagamentoResponse>
+    public class CancelarOrdemPagamentoHandler : BSUseCaseHandler<TransactionCancelarOrdemPagamento, BaseReturn<JDPICancelarOrdemPagamentoResponse>, JDPICancelarOrdemPagamentoResponse>
     {
 
         public CancelarOrdemPagamentoHandler(IServiceProvider serviceProvider) : base(serviceProvider)
@@ -12,35 +13,34 @@ namespace Domain.UseCases.Pagamento.CancelarOrdemPagamento
 
         }
 
-        protected override async Task ValidateTransaction(TransactionCancelarOrdemPagamento transaction, CancellationToken cancellationToken)
+        protected override async Task<ValidationResult> ExecuteSpecificValidations(TransactionCancelarOrdemPagamento transaction, CancellationToken cancellationToken)
         {
-            var _result = _validateService.ValidarIdReqSistemaCliente(transaction.idReqSistemaCliente);
-            if (!_result.IsValid)
-                _validateException.erros.AddRange(_result.Errors);
+            var errors = new List<ErrorDetails>();
 
+            var clienteValidation = _validateService.ValidarIdReqSistemaCliente(transaction.idReqSistemaCliente);
+            if (!clienteValidation.IsValid)
+                errors.AddRange(clienteValidation.Errors);
 
-            _result = _validateService.ValidarMotivo(transaction.motivo);
-            if (!_result.IsValid)
-                _validateException.erros.AddRange(_result.Errors);
+            var motivoValidation = _validateService.ValidarMotivo(transaction.motivo);
+            if (!motivoValidation.IsValid)
+                errors.AddRange(motivoValidation.Errors);
 
-            if (_validateException.erros.Count > 0)
-                throw _validateException;
-
+            return errors.Count > 0 ? ValidationResult.Invalid(errors) : ValidationResult.Valid();
         }
+
 
 
         protected override async Task<JDPICancelarOrdemPagamentoResponse> ExecuteTransactionProcessing(TransactionCancelarOrdemPagamento transaction, CancellationToken cancellationToken)
         {
             try
             {
-                var _result = await _spaRepoSql.CancelarOrdemPagamento(transaction);
-                var _handleResult = await HandleProcessingResult(_result.result, _result.exception);
-                return new JDPICancelarOrdemPagamentoResponse(_handleResult);
-
+                var result = await _spaRepoSql.CancelarOrdemPagamento(transaction);
+                var handledResult = await HandleProcessingResult(result.result, result.exception);
+                return new JDPICancelarOrdemPagamentoResponse(handledResult);
             }
             catch (Exception dbEx)
             {
-                _loggingAdapter.LogError("Database error", dbEx);
+                _loggingAdapter.LogError("Erro de database durante cancelamento", dbEx);
                 throw;
             }
         }
@@ -56,9 +56,12 @@ namespace Domain.UseCases.Pagamento.CancelarOrdemPagamento
         }
 
 
+        /// <summary>
+        /// ✅ REFATORADO: Retorno de erro usando Result Pattern
+        /// </summary>
         protected override BaseReturn<JDPICancelarOrdemPagamentoResponse> ReturnErrorResponse(Exception exception, string correlationId)
         {
-            return new BaseReturn<JDPICancelarOrdemPagamentoResponse>(exception, false, correlationId);
+            return BaseReturn<JDPICancelarOrdemPagamentoResponse>.FromException(exception, correlationId);
         }
 
     }

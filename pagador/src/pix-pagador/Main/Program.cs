@@ -15,7 +15,7 @@ var configuration = new ConfigurationBuilder()
     .AddEnvironmentVariables()
     .Build();
 
-builder.Services.ConfigureSwagger("APISample","v1");
+builder.Services.ConfigureSwagger("APISample", "v1");
 builder.Services.ConfigureMicroservice(configuration);
 Console.WriteLine($"Serviço: {Assembly.GetExecutingAssembly().GetName()} Versão: {Assembly.GetExecutingAssembly().GetName().Version}");
 

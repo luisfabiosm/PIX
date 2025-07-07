@@ -1,5 +1,5 @@
-﻿using Domain.Core.Base;
-using System.Text.Json;
+﻿using Domain.Core.Common.Serialization;
+using Domain.Core.Common.Transaction;
 
 namespace Domain.Core.Models.Response
 {
@@ -7,12 +7,13 @@ namespace Domain.Core.Models.Response
     {
         public JDPICancelarOrdemPagamentoResponse()
         {
-            
+
         }
 
         public JDPICancelarOrdemPagamentoResponse(string result)
         {
-            var _result = JsonSerializer.Deserialize<JDPICancelarOrdemPagamentoResponse>(result);
+            var _result = result.FromJsonOptimized<JDPICancelarOrdemPagamentoResponse>(JsonOptions.Default);
+            if (_result == null) return;
 
             chvAutorizador = _result.chvAutorizador;
 

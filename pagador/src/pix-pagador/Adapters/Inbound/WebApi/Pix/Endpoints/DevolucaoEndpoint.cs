@@ -1,8 +1,9 @@
 ﻿using Adapters.Inbound.WebApi.Pix.Mapping;
-using Domain.Core.Base;
-using Domain.Core.Mediator;
+using Domain.Core.Common.Mediator;
+using Domain.Core.Common.ResultPattern;
 using Domain.Core.Models.Request;
 using Domain.Core.Models.Response;
+using Domain.Services;
 using Domain.UseCases.Devolucao.CancelarOrdemDevolucao;
 using Domain.UseCases.Devolucao.EfetivarOrdemDevolucao;
 using Domain.UseCases.Devolucao.RegistrarOrdemDevolucao;
@@ -22,23 +23,31 @@ namespace Adapters.Inbound.WebApi.Pix.Endpoints
 
 
             group.MapPost("requisitar", async (
+                  HttpContext httpContext,
                   [FromBody] JDPIRequisitarDevolucaoOrdemPagtoRequest request,
                   [FromServices] BSMediator bSMediator,
-                  [FromServices] MappingHttpRequestToTransaction mapping
+                  [FromServices] MappingHttpRequestToTransaction mapping,
+                  [FromServices] CorrelationIdGenerator correlationIdGenerator
                   ) =>
             {
-                      string correlationId = Guid.NewGuid().ToString();
-                      var transaction = mapping.ToTransactionRegistrarOrdemDevolucao(request, correlationId, 1);
-                      var _result = await bSMediator.Send<TransactionRegistrarOrdemDevolucao, BaseReturn<JDPIRegistrarOrdemDevolucaoResponse>>(transaction);
+                var correlationId = correlationIdGenerator.GenerateWithPrefix("DEV");
+                var transaction = mapping.ToTransactionRegistrarOrdemDevolucao(httpContext, request, correlationId, 1);
+                var result = await bSMediator.Send<TransactionRegistrarOrdemDevolucao, BaseReturn<JDPIRegistrarOrdemDevolucaoResponse>>(transaction);
 
-                      if (!_result.Success)
-                          _result.ThrowIfError();
+                return result.Match(
+                    onSuccess: (data, correlId) => Results.Ok(data),
+                    onFailure: (error, errorCode, correlId) => Results.Problem(
+                        detail: error,
+                        statusCode: errorCode == 400 ? 400 : 500,
+                        title: "Erro na requisição de devolução",
+                        extensions: new Dictionary<string, object?> { ["correlationId"] = correlId }
+                    )
+                );
 
-                      return Results.Ok(_result.Data);
             })
                   .WithName("Requisitar Ordem Devolução")
                   .WithDescription("Requisitar inicio de Ordem de Devolução")
-                  .Produces(StatusCodes.Status200OK)
+                  .Produces<JDPIRegistrarOrdemDevolucaoResponse>(StatusCodes.Status200OK)
                   .Produces(StatusCodes.Status401Unauthorized)
                   .Produces(StatusCodes.Status400BadRequest);
 
@@ -46,23 +55,30 @@ namespace Adapters.Inbound.WebApi.Pix.Endpoints
 
 
             group.MapPost("cancelar", async (
+                  HttpContext httpContext,
                   [FromBody] JDPICancelarRegistroOrdemdDevolucaoRequest request,
                   [FromServices] BSMediator bSMediator,
-                  [FromServices] MappingHttpRequestToTransaction mapping
+                  [FromServices] MappingHttpRequestToTransaction mapping,
+                  [FromServices] CorrelationIdGenerator correlationIdGenerator
                   ) =>
             {
-                      string correlationId = Guid.NewGuid().ToString();
-                      var transaction = mapping.ToTransactionCancelarOrdemDevolucao(request, correlationId, 1);
-                      var _result = await bSMediator.Send<TransactionCancelarOrdemDevolucao, BaseReturn<JDPICancelarOrdemDevolucaoResponse>>(transaction);
+                var correlationId = correlationIdGenerator.GenerateWithPrefix("CDEV");
+                var transaction = mapping.ToTransactionCancelarOrdemDevolucao(httpContext, request, correlationId, 1);
+                var result = await bSMediator.Send<TransactionCancelarOrdemDevolucao, BaseReturn<JDPICancelarOrdemDevolucaoResponse>>(transaction);
 
-                      if (!_result.Success)
-                          _result.ThrowIfError();
-
-                      return Results.Ok(_result.Data);
+                return result.Match(
+                    onSuccess: (data, correlId) => Results.Ok(data),
+                    onFailure: (error, errorCode, correlId) => Results.Problem(
+                        detail: error,
+                        statusCode: errorCode == 400 ? 400 : 500,
+                        title: "Erro no cancelamento de devolução",
+                        extensions: new Dictionary<string, object?> { ["correlationId"] = correlId }
+                    )
+                );
             })
                   .WithName("Cancelar Ordem Devolução")
                   .WithDescription("Cancelar Ordem de Devolução iniciada")
-                  .Produces(StatusCodes.Status200OK)
+                  .Produces<JDPICancelarOrdemDevolucaoResponse>(StatusCodes.Status200OK)
                   .Produces(StatusCodes.Status401Unauthorized)
                   .Produces(StatusCodes.Status400BadRequest);
 
@@ -70,23 +86,30 @@ namespace Adapters.Inbound.WebApi.Pix.Endpoints
 
 
             group.MapPost("efetivar", async (
+                  HttpContext httpContext,
                   [FromBody] JDPIEfetivarOrdemDevolucaoRequest request,
                   [FromServices] BSMediator bSMediator,
-                  [FromServices] MappingHttpRequestToTransaction mapping
+                  [FromServices] MappingHttpRequestToTransaction mapping,
+                  [FromServices] CorrelationIdGenerator correlationIdGenerator
                  ) =>
             {
-                string correlationId = Guid.NewGuid().ToString();
-                var transaction = mapping.ToTransactionEfetivarOrdemDevolucao(request, correlationId, 1);
-                var _result = await bSMediator.Send<TransactionEfetivarOrdemDevolucao, BaseReturn<JDPIEfetivarOrdemDevolucaoResponse>>(transaction);
+                var correlationId = correlationIdGenerator.GenerateWithPrefix("EDEV");
+                var transaction = mapping.ToTransactionEfetivarOrdemDevolucao(httpContext, request, correlationId, 1);
+                var result = await bSMediator.Send<TransactionEfetivarOrdemDevolucao, BaseReturn<JDPIEfetivarOrdemDevolucaoResponse>>(transaction);
 
-                if (!_result.Success)
-                    _result.ThrowIfError();
-
-                return Results.Ok(_result.Data);
+                return result.Match(
+                    onSuccess: (data, correlId) => Results.Ok(data),
+                    onFailure: (error, errorCode, correlId) => Results.Problem(
+                        detail: error,
+                        statusCode: errorCode == 400 ? 400 : 500,
+                        title: "Erro na efetivação de devolução",
+                        extensions: new Dictionary<string, object?> { ["correlationId"] = correlId }
+                    )
+                );
             })
                .WithName("Efetivar Ordem Devolução")
                .WithDescription("Efetivar Ordem de Devolução registrada")
-               .Produces(StatusCodes.Status200OK)
+               .Produces<JDPIEfetivarOrdemDevolucaoResponse>(StatusCodes.Status200OK)
                .Produces(StatusCodes.Status401Unauthorized)
                .Produces(StatusCodes.Status400BadRequest);
         }

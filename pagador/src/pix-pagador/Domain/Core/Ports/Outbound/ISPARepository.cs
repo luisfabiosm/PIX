@@ -10,7 +10,7 @@ namespace Domain.Core.Ports.Outbound
     public interface ISPARepository : IDisposable
     {
 
-  
+
         ValueTask<(string result, Exception exception)> RegistrarOrdemPagamento(TransactionRegistrarOrdemPagamento transaction);
 
         ValueTask<(string result, Exception exception)> EfetivarOrdemPagamento(TransactionEfetivarOrdemPagamento transaction);

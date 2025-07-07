@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Domain.Core.Models.Util
+﻿namespace Domain.Core.Models.Util
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
     public class ProcedureAttribute : Attribute

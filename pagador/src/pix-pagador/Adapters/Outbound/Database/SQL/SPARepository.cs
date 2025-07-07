@@ -1,5 +1,5 @@
 ﻿using Dapper;
-using Domain.Core.Base;
+using Domain.Core.Common.Base;
 using Domain.Core.Ports.Outbound;
 using Domain.UseCases.Devolucao.CancelarOrdemDevolucao;
 using Domain.UseCases.Devolucao.EfetivarOrdemDevolucao;
@@ -16,7 +16,7 @@ namespace Adapters.Outbound.Database.SQL
 
         public SPARepository(IServiceProvider serviceProvider) : base(serviceProvider)
         {
-            
+
         }
 
         public async ValueTask<(string result, Exception exception)> EfetivarOrdemPagamento(TransactionEfetivarOrdemPagamento transaction)
@@ -76,9 +76,9 @@ namespace Adapters.Outbound.Database.SQL
                 _loggingAdapter.AddProperty("Recebedor Conta", transaction.recebedor.nrConta);
                 _loggingAdapter.AddProperty("Recebedor CPF-CNPJ", transaction.recebedor.cpfCnpj.ToString());
                 _loggingAdapter.AddProperty("Chave Idempotencia", transaction.chaveIdempotencia);
-
                 _loggingAdapter.AddProperty("Valor", transaction.valor.ToString());
-         
+                _loggingAdapter.AddProperty("@pvchMsgPixIN", transaction.getTransactionSerialization());
+
                 await _dbConnection.ExecuteWithRetryAsync(async (_connection) =>
                 {
 
@@ -94,6 +94,7 @@ namespace Adapters.Outbound.Database.SQL
                     // Parâmetro de saída
                     _parameters.Add("@pvchMsgPixOUT", dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 4000);
 
+
                     await _connection.ExecuteAsync("sps_PixBloqueioSaldo", _parameters,
                             commandTimeout: _dbsettings.Value.CommandTimeout,
                             commandType: CommandType.StoredProcedure);
@@ -101,13 +102,13 @@ namespace Adapters.Outbound.Database.SQL
                     _mensagemPixOut = _parameters.Get<string>("@pvchMsgPixOUT");
                 });
 
-                return (_mensagemPixOut, null);
+                return HandleSpsReturn("RegistrarOrdemPagamento", _mensagemPixOut);
             }
             catch (Exception ex)
             {
                 return HandleException("RegistrarOrdemPagamento", ex);
             }
-        
+
         }
 
 

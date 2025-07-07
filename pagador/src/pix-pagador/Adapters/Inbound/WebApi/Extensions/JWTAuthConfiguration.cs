@@ -18,12 +18,10 @@ namespace Adapters.Inbound.WebApi.Extensions
              {
                  options.TokenValidationParameters = new TokenValidationParameters
                  {
-                     ValidateIssuer = true,
-                     ValidateAudience = true,
+                     ValidateIssuer = false,
+                     ValidateAudience = false,
                      ValidateLifetime = true,
                      ValidateIssuerSigningKey = true,
-                     //ValidIssuer = configuration["Jwt:Issuer"] ?? "pix-pagador",
-                     //ValidAudience = configuration["Jwt:Audience"] ?? "pix-pagador",
                      IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"] ?? "dAWG7KP2xpHPN8aU1GfC82OkOqwXSz5w"))
                  };
              });

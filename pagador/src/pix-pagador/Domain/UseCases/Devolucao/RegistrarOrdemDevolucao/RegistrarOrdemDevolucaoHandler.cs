@@ -1,54 +1,54 @@
-﻿using Domain.Core.Base;
+﻿using Domain.Core.Common.Mediator;
+using Domain.Core.Common.ResultPattern;
+using Domain.Core.Exceptions;
 using Domain.Core.Models.Response;
-using Domain.UseCases.Pagamento.RegistrarOrdemPagamento;
 
 namespace Domain.UseCases.Devolucao.RegistrarOrdemDevolucao
 {
-    public class RegistrarOrdemDevolucaoHandler : BaseUseCaseHandler<TransactionRegistrarOrdemDevolucao, BaseReturn<JDPIRegistrarOrdemDevolucaoResponse>, JDPIRegistrarOrdemDevolucaoResponse>
+    public class RegistrarOrdemDevolucaoHandler : BSUseCaseHandler<TransactionRegistrarOrdemDevolucao, BaseReturn<JDPIRegistrarOrdemDevolucaoResponse>, JDPIRegistrarOrdemDevolucaoResponse>
     {
         public RegistrarOrdemDevolucaoHandler(IServiceProvider serviceProvider) : base(serviceProvider)
         {
 
         }
 
-        protected override async Task ValidateTransaction(TransactionRegistrarOrdemDevolucao transaction, CancellationToken cancellationToken)
+        protected override async Task<ValidationResult> ExecuteSpecificValidations(TransactionRegistrarOrdemDevolucao transaction, CancellationToken cancellationToken)
         {
-            var _result = _validateService.ValidarIdReqSistemaCliente(transaction.idReqSistemaCliente);
-            if (!_result.IsValid)
-                _validateException.erros.AddRange(_result.Errors);
+            var errors = new List<ErrorDetails>();
 
-            _result = _validateService.ValidarEndToEndIdOriginal(transaction.endToEndIdOriginal);
-            if (!_result.IsValid)
-                _validateException.erros.AddRange(_result.Errors);
+            // Validação de idReqSistemaCliente
+            var clienteValidation = _validateService.ValidarIdReqSistemaCliente(transaction.idReqSistemaCliente);
+            if (!clienteValidation.IsValid)
+                errors.AddRange(clienteValidation.Errors);
 
-  
+            var endToEndValidation = _validateService.ValidarEndToEndIdOriginal(transaction.endToEndIdOriginal);
+            if (!endToEndValidation.IsValid)
+                errors.AddRange(endToEndValidation.Errors);
 
-            _result = _validateService.ValidarCodigoDevolucao(transaction.codigoDevolucao);
-            if (!_result.IsValid)
-                _validateException.erros.AddRange(_result.Errors);
+            var codigoDevolucaoValidation = _validateService.ValidarCodigoDevolucao(transaction.codigoDevolucao);
+            if (!codigoDevolucaoValidation.IsValid)
+                errors.AddRange(codigoDevolucaoValidation.Errors);
 
-            _result = _validateService.ValidarValor(transaction.valorDevolucao);
-            if (!_result.IsValid)
-                _validateException.erros.AddRange(_result.Errors);
+            var valorDevolucaoValidation = _validateService.ValidarValor(transaction.valorDevolucao);
+            if (!valorDevolucaoValidation.IsValid)
+                errors.AddRange(valorDevolucaoValidation.Errors);
 
-
-            if (_validateException.erros.Count > 0)
-                throw _validateException;
-
+            return errors.Count > 0 ? ValidationResult.Invalid(errors) : ValidationResult.Valid();
         }
+
 
         protected override async Task<JDPIRegistrarOrdemDevolucaoResponse> ExecuteTransactionProcessing(TransactionRegistrarOrdemDevolucao transaction, CancellationToken cancellationToken)
         {
+
             try
             {
-                var _result = await _spaRepoSql.RegistrarOrdemDevolucao(transaction);
-                var _handleResult = await HandleProcessingResult(_result.result, _result.exception);
-                return new JDPIRegistrarOrdemDevolucaoResponse(_handleResult);
-
+                var result = await _spaRepoSql.RegistrarOrdemDevolucao(transaction);
+                var handledResult = await HandleProcessingResult(result.result, result.exception);
+                return new JDPIRegistrarOrdemDevolucaoResponse(handledResult);
             }
             catch (Exception dbEx)
             {
-                _loggingAdapter.LogError("Database error", dbEx);
+                _loggingAdapter.LogError("Erro de database durante registro de ordem de devolução", dbEx);
                 throw;
             }
         }
@@ -66,7 +66,7 @@ namespace Domain.UseCases.Devolucao.RegistrarOrdemDevolucao
 
         protected override BaseReturn<JDPIRegistrarOrdemDevolucaoResponse> ReturnErrorResponse(Exception exception, string correlationId)
         {
-            return new BaseReturn<JDPIRegistrarOrdemDevolucaoResponse>(exception, false, correlationId);
+            return BaseReturn<JDPIRegistrarOrdemDevolucaoResponse>.FromException(exception, correlationId);
         }
 
     }

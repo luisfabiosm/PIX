@@ -1,10 +1,9 @@
-﻿using Domain.Core.Base;
+﻿using Domain.Core.Common.Base;
 using Domain.Core.Enum;
-using System;
 
 namespace Domain.Core.Exceptions
 {
-  
+
     public class BusinessException : Exception
     {
 
@@ -14,7 +13,7 @@ namespace Domain.Core.Exceptions
 
         public BusinessException()
         {
-            
+
         }
         public BusinessException(string message)
             : base(message)

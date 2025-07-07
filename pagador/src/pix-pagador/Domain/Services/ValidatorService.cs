@@ -189,7 +189,7 @@ namespace Domain.Services
         {
             if (value == null || value.Equals(default(T)) || (value is string s && string.IsNullOrWhiteSpace(s)))
             {
-                errors.Add(new ErrorDetails( fieldName, $"{fieldName} deve ser informado e nao pode ser nulo"));
+                errors.Add(new ErrorDetails(fieldName, $"{fieldName} deve ser informado e nao pode ser nulo"));
             }
         }
 

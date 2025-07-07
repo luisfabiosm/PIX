@@ -1,14 +1,14 @@
-﻿using Domain.Core.Ports.Outbound;
+﻿using Domain.Core.Exceptions;
+using Domain.Core.Ports.Outbound;
 using Domain.Core.Settings;
 using Microsoft.Extensions.Options;
 using System.Data;
-using System.Text;
 
-namespace Domain.Core.Base
+namespace Domain.Core.Common.Base
 {
     public class BaseSQLRepository : BaseService, IDisposable
     {
-    
+
         protected ISQLConnectionAdapter _dbConnection;
         protected IDbConnection _session;
         protected readonly IOptions<DBSettings> _dbsettings;
@@ -20,6 +20,15 @@ namespace Domain.Core.Base
         }
 
 
+        protected (string operation, Exception ex) HandleSpsReturn(string methodName, string spsReturn)
+        {
+            var _spsReturn = SpsErroReturn.Create(spsReturn);
+            var _exception = new SPSException(_spsReturn);
+
+            LogError(methodName, _exception);
+
+            return (methodName, _exception);
+        }
 
 
         ~BaseSQLRepository()

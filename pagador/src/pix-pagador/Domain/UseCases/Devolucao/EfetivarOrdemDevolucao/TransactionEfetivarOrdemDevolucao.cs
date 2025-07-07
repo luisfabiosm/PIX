@@ -1,6 +1,7 @@
-﻿using Domain.Core.Base;
+﻿using Domain.Core.Common.ResultPattern;
+using Domain.Core.Common.Serialization;
+using Domain.Core.Common.Transaction;
 using Domain.Core.Models.Response;
-using System.Text.Json;
 
 namespace Domain.UseCases.Devolucao.EfetivarOrdemDevolucao
 {
@@ -18,12 +19,13 @@ namespace Domain.UseCases.Devolucao.EfetivarOrdemDevolucao
 
         public TransactionEfetivarOrdemDevolucao()
         {
-            
+
         }
 
         public override string getTransactionSerialization()
         {
-            return JsonSerializer.Serialize(this);
+            return this.ToJsonOptimized(JsonOptions.Minimal);
+
         }
     }
 }

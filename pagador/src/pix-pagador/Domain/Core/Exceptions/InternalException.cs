@@ -1,7 +1,5 @@
-﻿using Domain.Core.Base;
+﻿using Domain.Core.Common.Base;
 using Domain.Core.Enum;
-using System;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Domain.Core.Exceptions
 {

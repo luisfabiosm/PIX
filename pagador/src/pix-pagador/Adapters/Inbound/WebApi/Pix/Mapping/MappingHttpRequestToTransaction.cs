@@ -1,20 +1,28 @@
-﻿
-using Domain.Core.Enum;
-using Domain.Core.Models.Request;
-using Domain.Core.Models.Response;
+﻿using Domain.Core.Models.Request;
+using Domain.Services;
 using Domain.UseCases.Devolucao.CancelarOrdemDevolucao;
 using Domain.UseCases.Devolucao.EfetivarOrdemDevolucao;
 using Domain.UseCases.Devolucao.RegistrarOrdemDevolucao;
 using Domain.UseCases.Pagamento.CancelarOrdemPagamento;
 using Domain.UseCases.Pagamento.EfetivarOrdemPagamento;
 using Domain.UseCases.Pagamento.RegistrarOrdemPagamento;
-using System.Linq.Expressions;
 
 namespace Adapters.Inbound.WebApi.Pix.Mapping
 {
+
+
     public class MappingHttpRequestToTransaction
     {
-        public TransactionRegistrarOrdemPagamento ToTransactionRegistrarOrdemPagamento(JDPIRegistrarOrdemPagtoRequest request, string correlationId, int code)
+        private readonly ContextAccessorService _contextAccessor;
+        private short Canal(HttpContext context) => _contextAccessor.GetCanal(context);
+        private string Idempotencia(HttpContext context) => _contextAccessor.GetChaveIdempotencia(context);
+
+        public MappingHttpRequestToTransaction(IServiceProvider serviceProvider)
+        {
+            _contextAccessor = serviceProvider.GetRequiredService<ContextAccessorService>();
+        }
+
+        public TransactionRegistrarOrdemPagamento ToTransactionRegistrarOrdemPagamento(HttpContext context, JDPIRegistrarOrdemPagtoRequest request, string correlationId, int code)
         {
             try
             {
@@ -37,10 +45,13 @@ namespace Adapters.Inbound.WebApi.Pix.Mapping
                     vlrDetalhe = request.vlrDetalhe,
                     agendamentoID = request.agendamentoID,
                     qrCode = request.qrCode,
+                    endToEndId = request.endToEndId,
+                    dtEnvioPag = request.dtEnvioPag,
                     consentId = request.consentId,
                     idConciliacaoRecebedor = request.idConciliacaoRecebedor,
                     chave = request.chave,
-
+                    canal = Canal(context),
+                    chaveIdempotencia = Idempotencia(context)
                 };
             }
             catch (Exception)
@@ -51,7 +62,7 @@ namespace Adapters.Inbound.WebApi.Pix.Mapping
 
 
 
-        public TransactionEfetivarOrdemPagamento ToTransactionEfetivarOrdemPagamento(JDPIEfetivarOrdemPagtoRequest request, string correlationId, int code)
+        public TransactionEfetivarOrdemPagamento ToTransactionEfetivarOrdemPagamento(HttpContext context, JDPIEfetivarOrdemPagtoRequest request, string correlationId, int code)
         {
             try
             {
@@ -63,7 +74,9 @@ namespace Adapters.Inbound.WebApi.Pix.Mapping
                     agendamentoID = request.agendamentoID,
                     idReqJdPi = request.idReqJdPi,
                     endToEndId = request.endToEndId,
-                    dtHrReqJdPi = request.dtHrReqJdPi
+                    dtHrReqJdPi = request.dtHrReqJdPi,
+                    canal = Canal(context),
+                    chaveIdempotencia = Idempotencia(context)
                 };
             }
             catch (Exception)
@@ -73,7 +86,7 @@ namespace Adapters.Inbound.WebApi.Pix.Mapping
         }
 
 
-        public TransactionCancelarOrdemPagamento ToTransactionCancelarOrdemPagamento(JDPICancelarRegistroOrdemPagtoRequest request, string correlationId, int code)
+        public TransactionCancelarOrdemPagamento ToTransactionCancelarOrdemPagamento(HttpContext context, JDPICancelarRegistroOrdemPagtoRequest request, string correlationId, int code)
         {
             try
             {
@@ -84,7 +97,9 @@ namespace Adapters.Inbound.WebApi.Pix.Mapping
                     idReqSistemaCliente = request.idReqSistemaCliente,
                     agendamentoID = request.agendamentoID,
                     motivo = request.motivo,
-                    tipoErro = request.tipoErro
+                    tipoErro = request.tipoErro,
+                    canal = Canal(context),
+                    chaveIdempotencia = Idempotencia(context)
                 };
             }
             catch (Exception)
@@ -94,7 +109,7 @@ namespace Adapters.Inbound.WebApi.Pix.Mapping
         }
 
 
-        public TransactionRegistrarOrdemDevolucao ToTransactionRegistrarOrdemDevolucao(JDPIRequisitarDevolucaoOrdemPagtoRequest request, string correlationId, int code)
+        public TransactionRegistrarOrdemDevolucao ToTransactionRegistrarOrdemDevolucao(HttpContext context, JDPIRequisitarDevolucaoOrdemPagtoRequest request, string correlationId, int code)
         {
             try
             {
@@ -108,7 +123,10 @@ namespace Adapters.Inbound.WebApi.Pix.Mapping
                     endToEndIdDevolucao = request.endToEndIdDevolucao,
                     codigoDevolucao = request.codigoDevolucao,
                     motivoDevolucao = request.motivoDevolucao,
-                    valorDevolucao = request.valorDevolucao
+                    valorDevolucao = request.valorDevolucao,
+                    canal = Canal(context),
+                    chaveIdempotencia = Idempotencia(context)
+
 
                 };
             }
@@ -119,7 +137,7 @@ namespace Adapters.Inbound.WebApi.Pix.Mapping
         }
 
 
-        public TransactionEfetivarOrdemDevolucao ToTransactionEfetivarOrdemDevolucao(JDPIEfetivarOrdemDevolucaoRequest request, string correlationId, int code)
+        public TransactionEfetivarOrdemDevolucao ToTransactionEfetivarOrdemDevolucao(HttpContext context, JDPIEfetivarOrdemDevolucaoRequest request, string correlationId, int code)
         {
             try
             {
@@ -132,7 +150,9 @@ namespace Adapters.Inbound.WebApi.Pix.Mapping
                     idReqJdPi = request.idReqJdPi,
                     endToEndIdOriginal = request.endToEndIdOriginal,
                     endToEndIdDevolucao = request.endToEndIdDevolucao,
-                    dtHrReqJdPi = request.dtHrReqJdPi
+                    dtHrReqJdPi = request.dtHrReqJdPi,
+                    canal = Canal(context),
+                    chaveIdempotencia = Idempotencia(context)
 
                 };
 
@@ -144,7 +164,7 @@ namespace Adapters.Inbound.WebApi.Pix.Mapping
         }
 
 
-        public TransactionCancelarOrdemDevolucao ToTransactionCancelarOrdemDevolucao(JDPICancelarRegistroOrdemdDevolucaoRequest request, string correlationId, int code)
+        public TransactionCancelarOrdemDevolucao ToTransactionCancelarOrdemDevolucao(HttpContext context, JDPICancelarRegistroOrdemdDevolucaoRequest request, string correlationId, int code)
         {
             try
             {
@@ -154,6 +174,8 @@ namespace Adapters.Inbound.WebApi.Pix.Mapping
                     CorrelationId = correlationId,
                     Code = code,
                     idReqSistemaCliente = request.idReqSistemaCliente,
+                    canal = Canal(context),
+                    chaveIdempotencia = Idempotencia(context)
 
                 };
 
@@ -168,4 +190,3 @@ namespace Adapters.Inbound.WebApi.Pix.Mapping
     }
 }
 
-      

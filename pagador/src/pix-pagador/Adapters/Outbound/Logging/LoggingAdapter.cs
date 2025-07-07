@@ -12,7 +12,7 @@ namespace Adapters.Outbound.Logging
         private bool _disposed;
 
 
-    
+
         public LoggingAdapter(
              string sourceName)
         {

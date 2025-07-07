@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics.Metrics;
 using System.Reflection;
-using System.Xml.Linq;
 
 namespace Adapters.Outbound.Metrics
 {

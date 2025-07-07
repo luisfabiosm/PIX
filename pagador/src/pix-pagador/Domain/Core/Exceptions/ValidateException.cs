@@ -1,7 +1,4 @@
-﻿using MongoDB.Bson.Serialization.Conventions;
-using System;
-
-namespace Domain.Core.Exceptions
+﻿namespace Domain.Core.Exceptions
 {
 
     public class ValidateException : Exception
@@ -12,7 +9,7 @@ namespace Domain.Core.Exceptions
 
         public ValidateException()
         {
-            
+
         }
         public void AddDetails(ErrorDetails details)
         {

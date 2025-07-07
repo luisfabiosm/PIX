@@ -1,7 +1,7 @@
 ﻿using Domain.Core.Exceptions;
 using Domain.Core.Ports.Outbound;
 
-namespace Domain.Core.Base
+namespace Domain.Core.Common.Base
 {
     public class BaseService
     {
@@ -26,7 +26,7 @@ namespace Domain.Core.Base
         }
 
 
-        private void LogError(string methodName, Exception exception)
+        protected void LogError(string methodName, Exception exception)
         {
             _loggingAdapter.LogError($"Erro em: {methodName} - {exception.Message}", exception);
         }

@@ -41,9 +41,10 @@ namespace Domain.Core.Settings
 
     internal static class CryptSPA
     {
+        static string chave = "w3@sb1r0";
+
         public static string decryptDES(string sDados)
         {
-            string chave = "h&xt&m?|";
 
             DESCryptoServiceProvider DES = new DESCryptoServiceProvider();
 
@@ -59,7 +60,6 @@ namespace Domain.Core.Settings
 
         public static string encryptDES(string sDados)
         {
-            string chave = "h&xt&m?|";
             DESCryptoServiceProvider DES = new DESCryptoServiceProvider();
 
             DES.Mode = CipherMode.ECB;

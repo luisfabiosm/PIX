@@ -1,5 +1,5 @@
-﻿using Domain.Core.Base;
-using System.Text.Json;
+﻿using Domain.Core.Common.Serialization;
+using Domain.Core.Common.Transaction;
 
 namespace Domain.Core.Models.Response
 {
@@ -12,13 +12,13 @@ namespace Domain.Core.Models.Response
 
         public JDPIRegistrarOrdemPagamentoResponse(string result)
         {
-            var _result = JsonSerializer.Deserialize<JDPIRegistrarOrdemPagamentoResponse>(result);
+            var _result = result.FromJsonOptimized<JDPIRegistrarOrdemPagamentoResponse>(JsonOptions.Default);
+            if (_result == null) return;
 
             valorCheqEspUtilizado = _result.valorCheqEspUtilizado;
             agendamentoID = _result.agendamentoID;
             comprovante = _result.comprovante;
             chvAutorizador = _result.chvAutorizador;
-
         }
     }
 }

@@ -1,31 +1,32 @@
-﻿using Domain.Core.Base;
+﻿using Domain.Core.Common.Mediator;
+using Domain.Core.Common.ResultPattern;
+using Domain.Core.Exceptions;
 using Domain.Core.Models.Response;
-using Domain.UseCases.Pagamento.RegistrarOrdemPagamento;
 
 namespace Domain.UseCases.Pagamento.EfetivarOrdemPagamento
 {
-    public class EfetivarOrdemPagamentoHandler : BaseUseCaseHandler<TransactionEfetivarOrdemPagamento, BaseReturn<JDPIEfetivarOrdemPagamentoResponse>, JDPIEfetivarOrdemPagamentoResponse>
+    public class EfetivarOrdemPagamentoHandler : BSUseCaseHandler<TransactionEfetivarOrdemPagamento, BaseReturn<JDPIEfetivarOrdemPagamentoResponse>, JDPIEfetivarOrdemPagamentoResponse>
     {
 
         public EfetivarOrdemPagamentoHandler(IServiceProvider serviceProvider) : base(serviceProvider)
         {
-            
+
         }
 
-        protected override async Task ValidateTransaction(TransactionEfetivarOrdemPagamento transaction, CancellationToken cancellationToken)
+
+        protected override async Task<ValidationResult> ExecuteSpecificValidations(TransactionEfetivarOrdemPagamento transaction, CancellationToken cancellationToken)
         {
-            var _result = _validateService.ValidarIdReqSistemaCliente(transaction.idReqSistemaCliente);
-            if (!_result.IsValid)
-                _validateException.erros.AddRange(_result.Errors);
+            var errors = new List<ErrorDetails>();
 
-           
-            _result = _validateService.ValidarEndToEndId(transaction.endToEndId);
-            if (!_result.IsValid)
-                _validateException.erros.AddRange(_result.Errors);
+            var clienteValidation = _validateService.ValidarIdReqSistemaCliente(transaction.idReqSistemaCliente);
+            if (!clienteValidation.IsValid)
+                errors.AddRange(clienteValidation.Errors);
 
-            if (_validateException.erros.Count > 0)
-                throw _validateException;
+            var endToEndValidation = _validateService.ValidarEndToEndId(transaction.endToEndId);
+            if (!endToEndValidation.IsValid)
+                errors.AddRange(endToEndValidation.Errors);
 
+            return errors.Count > 0 ? ValidationResult.Invalid(errors) : ValidationResult.Valid();
         }
 
 
@@ -33,14 +34,13 @@ namespace Domain.UseCases.Pagamento.EfetivarOrdemPagamento
         {
             try
             {
-                var _result = await _spaRepoSql.EfetivarOrdemPagamento(transaction);
-                var _handleResult = await HandleProcessingResult(_result.result, _result.exception);
-                return new JDPIEfetivarOrdemPagamentoResponse(_handleResult);
-
+                var result = await _spaRepoSql.EfetivarOrdemPagamento(transaction);
+                var handledResult = await HandleProcessingResult(result.result, result.exception);
+                return new JDPIEfetivarOrdemPagamentoResponse(handledResult);
             }
             catch (Exception dbEx)
             {
-                _loggingAdapter.LogError("Database error", dbEx);
+                _loggingAdapter.LogError("Erro de database durante efetivacao", dbEx);
                 throw;
             }
         }
@@ -58,7 +58,7 @@ namespace Domain.UseCases.Pagamento.EfetivarOrdemPagamento
 
         protected override BaseReturn<JDPIEfetivarOrdemPagamentoResponse> ReturnErrorResponse(Exception exception, string correlationId)
         {
-            return new BaseReturn<JDPIEfetivarOrdemPagamentoResponse>(exception, false, correlationId);
+            return BaseReturn<JDPIEfetivarOrdemPagamentoResponse>.FromException(exception, correlationId);
         }
 
     }
