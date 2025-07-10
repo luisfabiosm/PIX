@@ -23,7 +23,7 @@ namespace Domain.Services
         public string Generate(int length = DefaultLength)
         {
             if (length <= 0 || length > 64) // Limite de segurança
-                throw new ArgumentOutOfRangeException(nameof(length), "Length must be between 1 and 64");
+                throw new ArgumentOutOfRangeException(nameof(length), "Tamanho precisa ser entre 1 e 64");
 
             // Usa stack allocation para evitar heap allocation
             Span<char> chars = stackalloc char[length];

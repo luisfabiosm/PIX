@@ -1,4 +1,5 @@
-﻿using Domain.Core.Common.Base;
+﻿
+
 using Domain.Core.Enum;
 
 namespace Domain.Core.Exceptions
@@ -9,40 +10,56 @@ namespace Domain.Core.Exceptions
 
         public int ErrorCode { get; } = 400;
 
-        public List<object> erros = new List<object>();
+        public SpsErroReturn SpsError = null;
 
-        public BusinessException()
+
+        public BusinessException(string mensagem): base(mensagem)
         {
 
         }
-        public BusinessException(string message)
-            : base(message)
+
+        public static BusinessException Create(string mensagem, int codigo, string origem = "API")
         {
-            ErrorCode = 400;
-            erros.Add(new BaseError(ErrorCode, message, EnumErrorType.Business));
+            var _bexception = new BusinessException(mensagem);
+            _bexception.SpsError = new SpsErroReturn
+            {
+                codErro = codigo,
+                msgErro = mensagem,
+                origemErro = origem,
+                tipoErro = (int)EnumTipoErro.NEGOCIO
+            };
+            return _bexception;
+        }
+
+        public static BusinessException Create(SpsErroReturn spsReturn)
+        {
+            var _bexception = new BusinessException(spsReturn.msgErro);
+            _bexception.SpsError = spsReturn;
+            return _bexception;
         }
 
 
-        public BusinessException(string message, int errorCode)
-            : base(message)
-        {
-            ErrorCode = errorCode;
-            erros.Add(new BaseError(ErrorCode, message, EnumErrorType.Business));
-        }
+
+        //public BusinessException(SpsErroReturn spsReturn, string? mensagem = null) : base(mensagem)
+        //{
+        //    ErrorCode = spsReturn.tipoErro == 1 ? ErrorCode : 500;
+        //    mensagem = spsReturn.msgErro;
+        //    SpsError = spsReturn;
+        //}
 
 
-        public BusinessException(string message, int errorCode, object details)
-            : base(message)
-        {
-            ErrorCode = errorCode;
-            erros.Add(new BaseError(ErrorCode, message, EnumErrorType.Business));
+        //public BusinessException(string mensagem, int codigo, byte tipo) : base(mensagem)
+        //{
+        //    ErrorCode = tipo == 1 ? ErrorCode : 500;
+        //    SpsError = SpsErroReturn.Create(tipo, codigo, mensagem);
+        //}
 
-        }
+        //public BusinessException(string mensagem, int codigo) : base(mensagem)
+        //{
+        //    SpsError = SpsErroReturn.Create((int)EnumTipoErro.NEGOCIO, codigo, mensagem);
+        //}
 
-        public void AddDetails(ErrorDetails details)
-        {
-            this.erros.Add(details);
-        }
+
 
     }
 }

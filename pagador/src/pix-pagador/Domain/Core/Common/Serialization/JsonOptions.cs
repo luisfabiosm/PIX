@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using Domain.Core.Exceptions;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace Domain.Core.Common.Serialization;
@@ -23,7 +24,8 @@ public static class JsonOptions
         // Configurações de Converter
         Converters =
             {
-                new JsonStringEnumConverter(JsonNamingPolicy.CamelCase), // Enums como string
+                new ByteToIntConverter(),
+                //new JsonStringEnumConverter(JsonNamingPolicy.CamelCase), // Enums como string
             },
 
         // Configurações de Encoding
@@ -78,7 +80,31 @@ public static class JsonOptions
         PropertyNameCaseInsensitive = false,
         PropertyNamingPolicy = null
     };
+
+
+
+    public class ByteToIntConverter : JsonConverter<byte>
+    {
+        public override byte Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            if (reader.TokenType == JsonTokenType.Number)
+            {
+                return (byte)reader.GetInt32();
+            }
+            return reader.GetByte();
+        }
+
+        public override void Write(Utf8JsonWriter writer, byte value, JsonSerializerOptions options)
+        {
+            writer.WriteNumberValue((int)value);
+        }
+    }
+
+
+
+   
 }
+
 
 
 

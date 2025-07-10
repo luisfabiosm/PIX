@@ -11,9 +11,6 @@ public class RegistrarOrdemPagamentoHandler : BSUseCaseHandler<TransactionRegist
     {
     }
 
-    /// <summary>
-    /// ✅ NOVO: Validações específicas usando Result Pattern
-    /// </summary>
     protected override async Task<ValidationResult> ExecuteSpecificValidations(TransactionRegistrarOrdemPagamento transaction, CancellationToken cancellationToken)
     {
         var errors = new List<ErrorDetails>();
@@ -68,27 +65,27 @@ public class RegistrarOrdemPagamentoHandler : BSUseCaseHandler<TransactionRegist
         return errors.Count > 0 ? ValidationResult.Invalid(errors) : ValidationResult.Valid();
     }
 
-    /// <summary>
-    /// ✅ NOVO: Processamento principal sem exceptions
-    /// </summary>
+
     protected override async Task<JDPIRegistrarOrdemPagamentoResponse> ExecuteTransactionProcessing(TransactionRegistrarOrdemPagamento transaction, CancellationToken cancellationToken)
     {
         try
         {
             var result = await _spaRepoSql.RegistrarOrdemPagamento(transaction);
-            var handledResult = await HandleProcessingResult(result.result, result.exception);
-            return new JDPIRegistrarOrdemPagamentoResponse(handledResult);
+            return new JDPIRegistrarOrdemPagamentoResponse(await HandleProcessingResult(result));
         }
-        catch (Exception dbEx)
+        catch (BusinessException bex)
         {
-            _loggingAdapter.LogError("Erro de database durante registro de ordem de pagamento", dbEx);
+            _loggingAdapter.LogError("Erro retornado pela Sps", bex);
+            throw;
+        }
+        catch (Exception ex) 
+        {
+            _loggingAdapter.LogError("Erro de database durante registro de ordem de pagamento", ex);
             throw;
         }
     }
 
-    /// <summary>
-    /// ✅ REFATORADO: Retorno de sucesso usando Result Pattern
-    /// </summary>
+
     protected override BaseReturn<JDPIRegistrarOrdemPagamentoResponse> ReturnSuccessResponse(JDPIRegistrarOrdemPagamentoResponse result, string message, string correlationId)
     {
         return BaseReturn<JDPIRegistrarOrdemPagamentoResponse>.FromSuccess(
@@ -98,12 +95,13 @@ public class RegistrarOrdemPagamentoHandler : BSUseCaseHandler<TransactionRegist
         );
     }
 
-    /// <summary>
-    /// ✅ REFATORADO: Retorno de erro usando Result Pattern
-    /// </summary>
+
     protected override BaseReturn<JDPIRegistrarOrdemPagamentoResponse> ReturnErrorResponse(Exception exception, string correlationId)
     {
+
         return BaseReturn<JDPIRegistrarOrdemPagamentoResponse>.FromException(exception, correlationId);
     }
+
+
 }
 

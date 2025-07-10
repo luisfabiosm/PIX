@@ -6,14 +6,14 @@ using Domain.Core.Models.Response;
 
 namespace Domain.UseCases.Pagamento.CancelarOrdemPagamento
 {
-    public record TransactionCancelarOrdemPagamento : BaseTransaction<BaseReturn<JDPICancelarOrdemPagamentoResponse>>
+    public sealed record TransactionCancelarOrdemPagamento : BaseTransaction<BaseReturn<JDPICancelarOrdemPagamentoResponse>>
     {
 
 
-        public string idReqSistemaCliente { get; set; }
-        public string agendamentoID { get; set; }
-        public string motivo { get; set; }
-        public EnumTipoErro tipoErro { get; set; }
+        public string idReqSistemaCliente { get; init; }
+        public string agendamentoID { get; init; }
+        public string motivo { get; init; }
+        public EnumTipoErro tipoErro { get; init; }
 
 
         public TransactionCancelarOrdemPagamento()

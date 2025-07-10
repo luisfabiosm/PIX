@@ -4,31 +4,44 @@ using Domain.Core.Common.Transaction;
 using Domain.Core.Enum;
 using Domain.Core.Models.JDPI;
 using Domain.Core.Models.Response;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Domain.UseCases.Pagamento.RegistrarOrdemPagamento
 {
-    public record TransactionRegistrarOrdemPagamento : BaseTransaction<BaseReturn<JDPIRegistrarOrdemPagamentoResponse>>
+    public sealed record TransactionRegistrarOrdemPagamento : BaseTransaction<BaseReturn<JDPIRegistrarOrdemPagamentoResponse>>
     {
-        public string idReqSistemaCliente { get; set; }
-        public EnumTpIniciacao tpIniciacao { get; set; }
-        public JDPIDadosContaPagador pagador { get; set; }
-        public JDPIDadosContaRecebedor recebedor { get; set; }
-        public double valor { get; set; }
-        public string chave { get; set; }
-        public string dtEnvioPag { get; set; }
-        public string endToEndId { get; set; }
-        public string idConciliacaoRecebedor { get; set; }
-        public string infEntreClientes { get; set; }
-        public string? cnpjIniciadorPagamento { get; set; }
-        public string? consentId { get; set; }
-        public EnumPrioridadePagamento? prioridadePagamento { get; set; }
-        public EnumTpPrioridadePagamento? tpPrioridadePagamento { get; set; }
-        public EnumTipoFinalidade? finalidade { get; set; }
-        public EnumModalidadeAgente? modalidadeAgente { get; set; }
-        public int? ispbPss { get; set; }
-        public List<JDPIValorDetalhe>? vlrDetalhe { get; set; }
-        public string qrCode { get; set; }
-        public string agendamentoID { get; set; }
+        public string idReqSistemaCliente { get; init; }
+        public EnumTpIniciacao tpIniciacao { get; init; }
+        public JDPIDadosContaPagador pagador { get; init; }
+        public JDPIDadosContaRecebedor recebedor { get; init; }
+        public double valor { get; init; }
+        public string chave { get; init; }
+        public string dtEnvioPag { get; init; }
+        public string endToEndId { get; init; }
+        public string idConciliacaoRecebedor { get; init; }
+        public string infEntreClientes { get; init; }
+        public string? cnpjIniciadorPagamento { get; init; }
+        public string? consentId { get; init; }
+
+
+
+        public EnumPrioridadePagamento? prioridadePagamento { get; init; }
+
+
+       
+        public EnumTpPrioridadePagamento? tpPrioridadePagamento { get; init; }
+
+       
+        public EnumTipoFinalidade? finalidade { get; init; }
+
+        
+        public EnumModalidadeAgente? modalidadeAgente { get; init; }
+
+        public int? ispbPss { get; init; }
+        public List<JDPIValorDetalhe>? vlrDetalhe { get; init; }
+        public string qrCode { get; init; }
+        public string agendamentoID { get; init; }
 
 
 
@@ -39,7 +52,9 @@ namespace Domain.UseCases.Pagamento.RegistrarOrdemPagamento
 
         public override string getTransactionSerialization()
         {
-            return this.ToJsonOptimized(JsonOptions.Minimal);
+        
+
+            return this.ToJsonOptimized(JsonOptions.Default);
 
         }
     }

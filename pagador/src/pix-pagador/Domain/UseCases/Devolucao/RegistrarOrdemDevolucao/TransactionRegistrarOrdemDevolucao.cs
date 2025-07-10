@@ -5,19 +5,19 @@ using Domain.Core.Models.Response;
 
 namespace Domain.UseCases.Devolucao.RegistrarOrdemDevolucao
 {
-    public record TransactionRegistrarOrdemDevolucao : BaseTransaction<BaseReturn<JDPIRegistrarOrdemDevolucaoResponse>>
+    public sealed record TransactionRegistrarOrdemDevolucao : BaseTransaction<BaseReturn<JDPIRegistrarOrdemDevolucaoResponse>>
     {
-        public string idReqSistemaCliente { get; set; }
+        public string idReqSistemaCliente { get; init; }
 
-        public string endToEndIdOriginal { get; set; }
+        public string endToEndIdOriginal { get; init; }
 
-        public string endToEndIdDevolucao { get; set; }
+        public string endToEndIdDevolucao { get; init; }
 
-        public string codigoDevolucao { get; set; }
+        public string codigoDevolucao { get; init; }
 
-        public string motivoDevolucao { get; set; }
+        public string motivoDevolucao { get; init; }
 
-        public double valorDevolucao { get; set; }
+        public double valorDevolucao { get; init; }
 
         public TransactionRegistrarOrdemDevolucao()
         {

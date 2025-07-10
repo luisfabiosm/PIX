@@ -19,16 +19,14 @@ namespace Domain.Core.Common.Base
             _dbsettings = serviceProvider.GetRequiredService<IOptions<DBSettings>>();
         }
 
+        //protected string HandleSpsReturn2(string methodName, string spsReturn)
+        //{
 
-        protected (string operation, Exception ex) HandleSpsReturn(string methodName, string spsReturn)
-        {
-            var _spsReturn = SpsErroReturn.Create(spsReturn);
-            var _exception = new SPSException(_spsReturn);
+        //   if ( spsReturn.IndexOf("codErro") > 0)
+        //        throw new SPSException(SpsErroReturn.Create(spsReturn));
 
-            LogError(methodName, _exception);
-
-            return (methodName, _exception);
-        }
+        //    return spsReturn;
+        //}
 
 
         ~BaseSQLRepository()
