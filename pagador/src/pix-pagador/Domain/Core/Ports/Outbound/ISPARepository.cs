@@ -11,7 +11,7 @@ namespace Domain.Core.Ports.Outbound
     {
 
 
-        ValueTask<(string result, Exception exception)> RegistrarOrdemPagamento(TransactionRegistrarOrdemPagamento transaction);
+        ValueTask<string> RegistrarOrdemPagamento(TransactionRegistrarOrdemPagamento transaction);
 
         ValueTask<(string result, Exception exception)> EfetivarOrdemPagamento(TransactionEfetivarOrdemPagamento transaction);
 

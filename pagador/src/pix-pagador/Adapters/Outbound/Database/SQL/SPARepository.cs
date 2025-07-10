@@ -1,5 +1,7 @@
-﻿using Dapper;
+﻿using Adapters.Outbound.Logging;
+using Dapper;
 using Domain.Core.Common.Base;
+using Domain.Core.Constant;
 using Domain.Core.Ports.Outbound;
 using Domain.UseCases.Devolucao.CancelarOrdemDevolucao;
 using Domain.UseCases.Devolucao.EfetivarOrdemDevolucao;
@@ -33,11 +35,11 @@ namespace Adapters.Outbound.Database.SQL
                 {
 
                     var _parameters = new DynamicParameters();
-                    _parameters.Add("@pvchOperador", "102020");
+                    _parameters.Add("@pvchOperador", OperationConstants.DEFAULT_OPERADOR);
                     _parameters.Add("@ptinCanal", byte.Parse(transaction.canal.ToString()));
-                    _parameters.Add("@psmlAgencia", 0);
-                    _parameters.Add("@ptinPosto", 1);
-                    _parameters.Add("@pvchEstacao", "pix-pagador");
+                    _parameters.Add("@psmlAgencia", OperationConstants.DEFAULT_AGENCIA);
+                    _parameters.Add("@ptinPosto", OperationConstants.DEFAULT_POSTO);
+                    _parameters.Add("@pvchEstacao", OperationConstants.DEFAULT_ESTACAO);
                     _parameters.Add("@pvchChvIdemPotencia", transaction.chaveIdempotencia);
                     _parameters.Add("@pvchMsgPixIN", transaction.getTransactionSerialization());
 
@@ -60,55 +62,50 @@ namespace Adapters.Outbound.Database.SQL
         }
 
 
-        public async ValueTask<(string result, Exception exception)> RegistrarOrdemPagamento(TransactionRegistrarOrdemPagamento transaction)
+        public async ValueTask<string> RegistrarOrdemPagamento(TransactionRegistrarOrdemPagamento transaction)
         {
-            try
+
+            using var operationContext = _loggingAdapter.StartOperation("IniciarPagamento", transaction.CorrelationId);
+            string _mensagemPixOut = string.Empty;
+
+            _loggingAdapter.AddProperty("Pagador Agencia", transaction.pagador.nrAgencia);
+            _loggingAdapter.AddProperty("Pagador Conta", transaction.pagador.nrConta);
+            _loggingAdapter.AddProperty("Pagador CPF-CNPJ", transaction.pagador.cpfCnpj.ToString());
+
+            _loggingAdapter.AddProperty("Recebedor Agencia", transaction.recebedor.nrAgencia);
+            _loggingAdapter.AddProperty("Recebedor Conta", transaction.recebedor.nrConta);
+            _loggingAdapter.AddProperty("Recebedor CPF-CNPJ", transaction.recebedor.cpfCnpj.ToString());
+            _loggingAdapter.AddProperty("Chave Idempotencia", transaction.chaveIdempotencia);
+            _loggingAdapter.AddProperty("Valor", transaction.valor.ToString());
+
+            var _msgIn = transaction.getTransactionSerialization();
+            _loggingAdapter.AddProperty("@pvchMsgPixIN", _msgIn);
+            _loggingAdapter.LogInformation(_msgIn);
+
+            await _dbConnection.ExecuteWithRetryAsync(async (_connection) =>
             {
 
-                using var operationContext = _loggingAdapter.StartOperation("IniciarPagamento", transaction.CorrelationId);
-                string _mensagemPixOut = string.Empty;
+                var _parameters = new DynamicParameters();
+                _parameters.Add("@pvchOperador", OperationConstants.DEFAULT_OPERADOR);
+                _parameters.Add("@ptinCanal", byte.Parse(transaction.canal.ToString()));
+                _parameters.Add("@psmlAgencia", OperationConstants.DEFAULT_AGENCIA);
+                _parameters.Add("@ptinPosto", OperationConstants.DEFAULT_POSTO);
+                _parameters.Add("@pvchEstacao", OperationConstants.DEFAULT_ESTACAO);
+                _parameters.Add("@pvchChvIdemPotencia", transaction.chaveIdempotencia);
+                _parameters.Add("@pvchMsgPixIN", _msgIn);
 
-                _loggingAdapter.AddProperty("Pagador Agencia", transaction.pagador.nrAgencia);
-                _loggingAdapter.AddProperty("Pagador Conta", transaction.pagador.nrConta);
-                _loggingAdapter.AddProperty("Pagador CPF-CNPJ", transaction.pagador.cpfCnpj.ToString());
-
-                _loggingAdapter.AddProperty("Recebedor Agencia", transaction.recebedor.nrAgencia);
-                _loggingAdapter.AddProperty("Recebedor Conta", transaction.recebedor.nrConta);
-                _loggingAdapter.AddProperty("Recebedor CPF-CNPJ", transaction.recebedor.cpfCnpj.ToString());
-                _loggingAdapter.AddProperty("Chave Idempotencia", transaction.chaveIdempotencia);
-                _loggingAdapter.AddProperty("Valor", transaction.valor.ToString());
-                _loggingAdapter.AddProperty("@pvchMsgPixIN", transaction.getTransactionSerialization());
-
-                await _dbConnection.ExecuteWithRetryAsync(async (_connection) =>
-                {
-
-                    var _parameters = new DynamicParameters();
-                    _parameters.Add("@pvchOperador", "102020");
-                    _parameters.Add("@ptinCanal", byte.Parse(transaction.canal.ToString()));
-                    _parameters.Add("@psmlAgencia", 0);
-                    _parameters.Add("@ptinPosto", 1);
-                    _parameters.Add("@pvchEstacao", "pix-pagador");
-                    _parameters.Add("@pvchChvIdemPotencia", transaction.chaveIdempotencia);
-                    _parameters.Add("@pvchMsgPixIN", transaction.getTransactionSerialization());
-
-                    // Parâmetro de saída
-                    _parameters.Add("@pvchMsgPixOUT", dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 4000);
+                // Parâmetro de saída
+                _parameters.Add("@pvchMsgPixOUT", dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 4000);
 
 
-                    await _connection.ExecuteAsync("sps_PixBloqueioSaldo", _parameters,
-                            commandTimeout: _dbsettings.Value.CommandTimeout,
-                            commandType: CommandType.StoredProcedure);
+                await _connection.ExecuteAsync("sps_PixBloqueioSaldo", _parameters,
+                        commandTimeout: _dbsettings.Value.CommandTimeout,
+                        commandType: CommandType.StoredProcedure);
 
-                    _mensagemPixOut = _parameters.Get<string>("@pvchMsgPixOUT");
-                });
+                _mensagemPixOut = _parameters.Get<string>("@pvchMsgPixOUT");
+            });
 
-                return HandleSpsReturn("RegistrarOrdemPagamento", _mensagemPixOut);
-            }
-            catch (Exception ex)
-            {
-                return HandleException("RegistrarOrdemPagamento", ex);
-            }
-
+            return _mensagemPixOut;// HandleSpsReturn2("RegistrarOrdemPagamento", _mensagemPixOut);
         }
 
 
@@ -126,11 +123,11 @@ namespace Adapters.Outbound.Database.SQL
                 {
 
                     var _parameters = new DynamicParameters();
-                    _parameters.Add("@pvchOperador", "102020");
+                    _parameters.Add("@pvchOperador", OperationConstants.DEFAULT_OPERADOR);
                     _parameters.Add("@ptinCanal", byte.Parse(transaction.canal.ToString()));
-                    _parameters.Add("@psmlAgencia", 0);
-                    _parameters.Add("@ptinPosto", 1);
-                    _parameters.Add("@pvchEstacao", "pix-pagador");
+                    _parameters.Add("@psmlAgencia", OperationConstants.DEFAULT_AGENCIA);
+                    _parameters.Add("@ptinPosto", OperationConstants.DEFAULT_POSTO);
+                    _parameters.Add("@pvchEstacao", OperationConstants.DEFAULT_ESTACAO);
                     _parameters.Add("@pvchChvIdemPotencia", transaction.chaveIdempotencia);
                     _parameters.Add("@pvchMsgPixIN", transaction.getTransactionSerialization());
 
@@ -168,11 +165,11 @@ namespace Adapters.Outbound.Database.SQL
                 {
 
                     var _parameters = new DynamicParameters();
-                    _parameters.Add("@pvchOperador", "102020");
+                    _parameters.Add("@pvchOperador", OperationConstants.DEFAULT_OPERADOR);
                     _parameters.Add("@ptinCanal", byte.Parse(transaction.canal.ToString()));
-                    _parameters.Add("@psmlAgencia", 0);
-                    _parameters.Add("@ptinPosto", 1);
-                    _parameters.Add("@pvchEstacao", "pix-pagador");
+                    _parameters.Add("@psmlAgencia", OperationConstants.DEFAULT_AGENCIA);
+                    _parameters.Add("@ptinPosto", OperationConstants.DEFAULT_POSTO);
+                    _parameters.Add("@pvchEstacao", OperationConstants.DEFAULT_ESTACAO);
                     _parameters.Add("@pvchChvIdemPotencia", transaction.chaveIdempotencia);
                     _parameters.Add("@pvchMsgPixIN", transaction.getTransactionSerialization());
 
@@ -210,11 +207,11 @@ namespace Adapters.Outbound.Database.SQL
                 {
 
                     var _parameters = new DynamicParameters();
-                    _parameters.Add("@pvchOperador", "102020");
+                    _parameters.Add("@pvchOperador", OperationConstants.DEFAULT_OPERADOR);
                     _parameters.Add("@ptinCanal", byte.Parse(transaction.canal.ToString()));
-                    _parameters.Add("@psmlAgencia", 0);
-                    _parameters.Add("@ptinPosto", 1);
-                    _parameters.Add("@pvchEstacao", "pix-pagador");
+                    _parameters.Add("@psmlAgencia", OperationConstants.DEFAULT_AGENCIA);
+                    _parameters.Add("@ptinPosto", OperationConstants.DEFAULT_POSTO);
+                    _parameters.Add("@pvchEstacao", OperationConstants.DEFAULT_ESTACAO);
                     _parameters.Add("@pvchChvIdemPotencia", transaction.chaveIdempotencia);
                     _parameters.Add("@pvchMsgPixIN", transaction.getTransactionSerialization());
 
@@ -251,11 +248,11 @@ namespace Adapters.Outbound.Database.SQL
                 {
 
                     var _parameters = new DynamicParameters();
-                    _parameters.Add("@pvchOperador", "102020");
+                    _parameters.Add("@pvchOperador", OperationConstants.DEFAULT_OPERADOR);
                     _parameters.Add("@ptinCanal", byte.Parse(transaction.canal.ToString()));
-                    _parameters.Add("@psmlAgencia", 0);
-                    _parameters.Add("@ptinPosto", 1);
-                    _parameters.Add("@pvchEstacao", "pix-pagador");
+                    _parameters.Add("@psmlAgencia", OperationConstants.DEFAULT_AGENCIA);
+                    _parameters.Add("@ptinPosto", OperationConstants.DEFAULT_POSTO);
+                    _parameters.Add("@pvchEstacao", OperationConstants.DEFAULT_ESTACAO);
                     _parameters.Add("@pvchChvIdemPotencia", transaction.chaveIdempotencia);
                     _parameters.Add("@pvchMsgPixIN", transaction.getTransactionSerialization());
 

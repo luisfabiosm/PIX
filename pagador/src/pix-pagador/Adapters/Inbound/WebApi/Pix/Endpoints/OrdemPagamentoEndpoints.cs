@@ -1,8 +1,8 @@
-﻿using Adapters.Inbound.WebApi.Pix.Mapping;
-using Domain.Core.Common.Mediator;
+﻿using Domain.Core.Common.Mediator;
 using Domain.Core.Common.ResultPattern;
 using Domain.Core.Models.Request;
 using Domain.Core.Models.Response;
+using Domain.Core.Ports.Domain;
 using Domain.Services;
 using Domain.UseCases.Pagamento.CancelarOrdemPagamento;
 using Domain.UseCases.Pagamento.EfetivarOrdemPagamento;
@@ -24,18 +24,17 @@ namespace Adapters.Inbound.WebApi.Pix.Endpoints
                          .WithTags("PIX Pagador")
                          .RequireAuthorization();
 
-            group.MapPost("registrar", async (
+            _ = group.MapPost("registrar", async (
                     HttpContext httpContext,
                     [FromBody] JDPIRegistrarOrdemPagtoRequest request,
                     [FromServices] BSMediator bSMediator,
-                    [FromServices] MappingHttpRequestToTransaction mapping,
+                    [FromServices] ITransactionFactory transactionFactory,
                     [FromServices] CorrelationIdGenerator correlationIdGenerator // ✅ NOVO PARÂMETRO
                     ) =>
                 {
 
                     var correlationId = correlationIdGenerator.GenerateWithPrefix("REG");
-
-                    var transaction = mapping.ToTransactionRegistrarOrdemPagamento(httpContext, request, correlationId, 1);
+                    var transaction = transactionFactory.CreateRegistrarOrdemPagamento(httpContext, request, correlationId);
                     var result = await bSMediator.Send<TransactionRegistrarOrdemPagamento, BaseReturn<JDPIRegistrarOrdemPagamentoResponse>>(transaction);
 
                     return result.Match(
@@ -60,12 +59,12 @@ namespace Adapters.Inbound.WebApi.Pix.Endpoints
                     HttpContext httpContext,
                     [FromBody] JDPICancelarRegistroOrdemPagtoRequest request,
                     [FromServices] BSMediator bSMediator,
-                    [FromServices] MappingHttpRequestToTransaction mapping,
+                    [FromServices] ITransactionFactory transactionFactory,
                     [FromServices] CorrelationIdGenerator correlationIdGenerator
                     ) =>
                 {
                     var correlationId = correlationIdGenerator.GenerateWithPrefix("CAN");
-                    var transaction = mapping.ToTransactionCancelarOrdemPagamento(httpContext, request, correlationId, 1);
+                    var transaction = transactionFactory.CreateCancelarOrdemPagamento(httpContext, request, correlationId);
                     var result = await bSMediator.Send<TransactionCancelarOrdemPagamento, BaseReturn<JDPICancelarOrdemPagamentoResponse>>(transaction);
 
                     return result.Match(
@@ -90,12 +89,12 @@ namespace Adapters.Inbound.WebApi.Pix.Endpoints
                    HttpContext httpContext,
                    [FromBody] JDPIEfetivarOrdemPagtoRequest request,
                    [FromServices] BSMediator bSMediator,
-                   [FromServices] MappingHttpRequestToTransaction mapping,
+                   [FromServices] ITransactionFactory transactionFactory,
                    [FromServices] CorrelationIdGenerator correlationIdGenerator
                    ) =>
                         {
                             var correlationId = correlationIdGenerator.GenerateWithPrefix("EFE");
-                            var transaction = mapping.ToTransactionEfetivarOrdemPagamento(httpContext, request, correlationId, 1);
+                            var transaction = transactionFactory.CreateEfetivarOrdemPagamento(httpContext, request, correlationId);
                             var result = await bSMediator.Send<TransactionEfetivarOrdemPagamento, BaseReturn<JDPIEfetivarOrdemPagamentoResponse>>(transaction);
 
                             return result.Match(

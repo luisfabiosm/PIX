@@ -1,7 +1,11 @@
 ﻿using Adapters.Inbound.WebApi.Middleware;
 using Adapters.Inbound.WebApi.Pix.Endpoints;
-using Adapters.Inbound.WebApi.Pix.Mapping;
+using Domain.Core.Common.Serialization;
+using Domain.Core.Common.Transaction;
+using Domain.Core.Ports.Domain;
 using Microsoft.OpenApi.Models;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace Adapters.Inbound.WebApi.Extensions
 {
@@ -10,12 +14,7 @@ namespace Adapters.Inbound.WebApi.Extensions
         public static IServiceCollection addWebApiEndpoints(this IServiceCollection services, IConfiguration configuration)
         {
 
-            services.ConfigureHttpJsonOptions(options =>
-            {
-                options.SerializerOptions.DefaultIgnoreCondition =
-                    System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
-            });
-            services.AddScoped<MappingHttpRequestToTransaction>();
+    
             services.AddEndpointsApiExplorer();
             services.AddHealthChecks();
             services.AddJwtAuthentication(configuration);

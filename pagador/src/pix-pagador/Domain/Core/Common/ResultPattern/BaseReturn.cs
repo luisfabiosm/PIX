@@ -91,9 +91,26 @@ public record BaseReturn<T>
         Func<T, string, TResult> onSuccess,
         Func<string, int, string, TResult> onFailure)
     {
-        return Result.IsSuccess
-            ? onSuccess(Result.Value, CorrelationId)
-            : onFailure(Result.Error, Result.ErrorCode, CorrelationId);
+        //return Result.IsSuccess
+        //    ? onSuccess(Result.Value, CorrelationId)
+        //    : onFailure(Result.Error, Result.ErrorCode, CorrelationId);
+
+        if (Result.IsSuccess)
+        {
+            //return Result.IsSuccess
+            //    ? onSuccess(Result.Value, CorrelationId)
+            //    : onFailure(Result.Error, Result.ErrorCode, CorrelationId);
+
+            return onSuccess(Result.Value, CorrelationId);
+        }
+        else
+        {
+            //return Result.IsSuccess
+            //    ? onSuccess(Result.Value, CorrelationId)
+            //    : onFailure(Result.Error, Result.ErrorCode, CorrelationId);
+
+            return onFailure(Result.Error, Result.ErrorCode, CorrelationId);
+        }
     }
 
     /// <summary>
@@ -112,7 +129,7 @@ public record BaseReturn<T>
         {
             throw Result.ErrorCode switch
             {
-                400 => new BusinessException(Result.Error, Result.ErrorCode, null),
+                400 => new BusinessException(Result.Error),//, Result.ErrorCode),
                 -1 => new ValidateException(Result.Error, Result.ErrorCode, null),
                 _ => new InternalException(Result.Error, Result.ErrorCode, null)
             };
@@ -124,7 +141,7 @@ public record BaseReturn<T>
     {
         return exception switch
         {
-            BusinessException businessEx => (businessEx.Message, businessEx.ErrorCode, includeDetails ? businessEx.erros : null),
+            BusinessException businessEx => (businessEx.Message, businessEx.ErrorCode, includeDetails ? businessEx.SpsError : null),
             InternalException internalEx => (internalEx.Message, internalEx.ErrorCode, includeDetails ? internalEx.erros : null),
             ValidateException validateEx => (validateEx.Message, validateEx.ErrorCode, validateEx.erros),
             _ => (exception.Message, -1, null)

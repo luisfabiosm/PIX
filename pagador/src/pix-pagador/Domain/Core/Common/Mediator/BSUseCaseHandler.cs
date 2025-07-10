@@ -72,6 +72,16 @@ namespace Domain.Core.Common.Mediator
 
                 return response;
             }
+            catch (BusinessException bex)
+            {
+
+                _loggingAdapter.LogError(
+                    "Erro retornado Sps: {RequestType} [CorrelationId: {CorrelationId}]", bex,
+                    typeof(TTransaction).Name,
+                    correlationId);
+
+                return await HandleBusinessError("Handle", transaction, bex, cancellationToken);
+            }
             catch (Exception ex)
             {
                 // Exceptions são tratadas apenas para erros não esperados
@@ -156,11 +166,21 @@ namespace Domain.Core.Common.Mediator
         /// <summary>
         /// Trata erros não esperados (que ainda usam exceptions).
         /// </summary>
+        protected virtual async Task<TResponse> HandleBusinessError(string operation, TTransaction transaction, BusinessException exception, CancellationToken cancellationToken)
+        {
+            _loggingAdapter.LogError("Erro não esperado em {Operation}", exception, operation);
+            return ReturnErrorResponse(exception, transaction.CorrelationId);
+        }
+
+        /// <summary>
+        /// Trata erros negocio (que ainda usam exceptions).
+        /// </summary>
         protected virtual async Task<TResponse> HandleUnexpectedError(string operation, TTransaction transaction, Exception exception, CancellationToken cancellationToken)
         {
             _loggingAdapter.LogError("Erro não esperado em {Operation}", exception, operation);
             return ReturnErrorResponse(exception, transaction.CorrelationId);
         }
+
 
         /// <summary>
         /// Processa resultado de repositório de forma segura.
@@ -173,6 +193,13 @@ namespace Domain.Core.Common.Mediator
                 throw exception;
             }
 
+            if (result.IndexOf("codErro") > 0)
+            {
+                var _bError = SpsErroReturn.Create(result);
+                throw BusinessException.Create(_bError);
+            }
+
+            //Ok
             return result;
         }
     }

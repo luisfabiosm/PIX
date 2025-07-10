@@ -1,8 +1,8 @@
-﻿using Adapters.Inbound.WebApi.Pix.Mapping;
-using Domain.Core.Common.Mediator;
+﻿using Domain.Core.Common.Mediator;
 using Domain.Core.Common.ResultPattern;
 using Domain.Core.Models.Request;
 using Domain.Core.Models.Response;
+using Domain.Core.Ports.Domain;
 using Domain.Services;
 using Domain.UseCases.Devolucao.CancelarOrdemDevolucao;
 using Domain.UseCases.Devolucao.EfetivarOrdemDevolucao;
@@ -26,12 +26,12 @@ namespace Adapters.Inbound.WebApi.Pix.Endpoints
                   HttpContext httpContext,
                   [FromBody] JDPIRequisitarDevolucaoOrdemPagtoRequest request,
                   [FromServices] BSMediator bSMediator,
-                  [FromServices] MappingHttpRequestToTransaction mapping,
+                  [FromServices] ITransactionFactory transactionFactory,
                   [FromServices] CorrelationIdGenerator correlationIdGenerator
                   ) =>
             {
                 var correlationId = correlationIdGenerator.GenerateWithPrefix("DEV");
-                var transaction = mapping.ToTransactionRegistrarOrdemDevolucao(httpContext, request, correlationId, 1);
+                var transaction = transactionFactory.CreateRegistrarOrdemDevolucao(httpContext, request, correlationId);
                 var result = await bSMediator.Send<TransactionRegistrarOrdemDevolucao, BaseReturn<JDPIRegistrarOrdemDevolucaoResponse>>(transaction);
 
                 return result.Match(
@@ -58,12 +58,12 @@ namespace Adapters.Inbound.WebApi.Pix.Endpoints
                   HttpContext httpContext,
                   [FromBody] JDPICancelarRegistroOrdemdDevolucaoRequest request,
                   [FromServices] BSMediator bSMediator,
-                  [FromServices] MappingHttpRequestToTransaction mapping,
+                  [FromServices] ITransactionFactory transactionFactory,
                   [FromServices] CorrelationIdGenerator correlationIdGenerator
                   ) =>
             {
                 var correlationId = correlationIdGenerator.GenerateWithPrefix("CDEV");
-                var transaction = mapping.ToTransactionCancelarOrdemDevolucao(httpContext, request, correlationId, 1);
+                var transaction = transactionFactory.CreateCancelarRegistroOrdemDevolucao(httpContext, request, correlationId);
                 var result = await bSMediator.Send<TransactionCancelarOrdemDevolucao, BaseReturn<JDPICancelarOrdemDevolucaoResponse>>(transaction);
 
                 return result.Match(
@@ -89,12 +89,12 @@ namespace Adapters.Inbound.WebApi.Pix.Endpoints
                   HttpContext httpContext,
                   [FromBody] JDPIEfetivarOrdemDevolucaoRequest request,
                   [FromServices] BSMediator bSMediator,
-                  [FromServices] MappingHttpRequestToTransaction mapping,
+                  [FromServices] ITransactionFactory transactionFactory,
                   [FromServices] CorrelationIdGenerator correlationIdGenerator
                  ) =>
             {
                 var correlationId = correlationIdGenerator.GenerateWithPrefix("EDEV");
-                var transaction = mapping.ToTransactionEfetivarOrdemDevolucao(httpContext, request, correlationId, 1);
+                var transaction = transactionFactory.CreateEfetivarOrdemDevolucao(httpContext, request, correlationId);
                 var result = await bSMediator.Send<TransactionEfetivarOrdemDevolucao, BaseReturn<JDPIEfetivarOrdemDevolucaoResponse>>(transaction);
 
                 return result.Match(

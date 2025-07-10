@@ -4,9 +4,12 @@ using Domain.UseCases.Devolucao.RegistrarOrdemDevolucao;
 using Domain.UseCases.Pagamento.CancelarOrdemPagamento;
 using Domain.UseCases.Pagamento.EfetivarOrdemPagamento;
 using Domain.UseCases.Pagamento.RegistrarOrdemPagamento;
+using Microsoft.VisualBasic;
 using System.Buffers;
+using System.Runtime.Intrinsics.X86;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Domain.Core.Common.Serialization;
 
@@ -26,23 +29,22 @@ public static class JsonExtensions
     /// <param name="value">Objeto a ser serializado</param>
     /// <param name="options">Opções de serialização (opcional, usa Default se não especificado)</param>
     /// <returns>JSON string serializada</returns>
+
     public static string ToJsonOptimized<T>(this T value, JsonSerializerOptions? options = null)
     {
         if (value == null) return "null";
 
         options ??= JsonOptions.Default;
 
-        // ✅ CORREÇÃO: Usar MemoryStream com ArrayPool
+
         var bufferSize = EstimateBufferSize<T>();
         var rentedBuffer = ByteArrayPool.Rent(bufferSize);
-
         try
         {
             using var memoryStream = new MemoryStream(rentedBuffer);
             using var writer = new Utf8JsonWriter(memoryStream);
             JsonSerializer.Serialize(writer, value, options);
             writer.Flush();
-
             var bytesWritten = (int)memoryStream.Position;
             return Encoding.UTF8.GetString(rentedBuffer.AsSpan(0, bytesWritten));
         }
@@ -51,7 +53,7 @@ public static class JsonExtensions
             ByteArrayPool.Return(rentedBuffer);
         }
     }
-
+ 
     /// <summary>
     /// Deserializa JSON string para objeto usando Source Generators otimizados.
     /// </summary>
@@ -321,4 +323,6 @@ public static class JsonExtensions
 
         return bufferWriter.WrittenSpan.ToArray();
     }
+
+
 }

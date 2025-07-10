@@ -1,6 +1,7 @@
 ﻿using Domain.Core.Common.Mediator;
 using Domain.Core.Common.ResultPattern;
 using Domain.Core.Common.Serialization;
+using Domain.Core.Common.Transaction;
 using Domain.Core.Models.Response;
 using Domain.Core.Ports.Domain;
 using Domain.Services;
@@ -10,8 +11,10 @@ using Domain.UseCases.Devolucao.RegistrarOrdemDevolucao;
 using Domain.UseCases.Pagamento.CancelarOrdemPagamento;
 using Domain.UseCases.Pagamento.EfetivarOrdemPagamento;
 using Domain.UseCases.Pagamento.RegistrarOrdemPagamento;
+using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using static Domain.Core.Common.Serialization.JsonOptions;
 
 namespace Configurations
 {
@@ -36,26 +39,18 @@ namespace Configurations
             #endregion
 
 
-            #region Domain MediatoR
+            #region Domain MediatoR  e Handlers - Auto Discovery
 
-            services.AddTransient<BSMediator>();
-
-            //PAGAMENTO
-            services.AddTransient<IBSRequestHandler<TransactionRegistrarOrdemPagamento, BaseReturn<JDPIRegistrarOrdemPagamentoResponse>>, RegistrarOrdemPagamentoHandler>(); //PARA CADA USECASE HANDLER
-            services.AddTransient<IBSRequestHandler<TransactionEfetivarOrdemPagamento, BaseReturn<JDPIEfetivarOrdemPagamentoResponse>>, EfetivarOrdemPagamentoHandler>(); //PARA CADA USECASE HANDLER
-            services.AddTransient<IBSRequestHandler<TransactionCancelarOrdemPagamento, BaseReturn<JDPICancelarOrdemPagamentoResponse>>, CancelarOrdemPagamentoHandler>(); //PARA CADA USECASE HANDLER
-
-            //DEVOLUCAO
-            services.AddTransient<IBSRequestHandler<TransactionRegistrarOrdemDevolucao, BaseReturn<JDPIRegistrarOrdemDevolucaoResponse>>, RegistrarOrdemDevolucaoHandler>(); //PARA CADA USECASE HANDLER
-            services.AddTransient<IBSRequestHandler<TransactionEfetivarOrdemDevolucao, BaseReturn<JDPIEfetivarOrdemDevolucaoResponse>>, EfetivarOrdemDevolucaoHandler>(); //PARA CADA USECASE HANDLER
-            services.AddTransient<IBSRequestHandler<TransactionCancelarOrdemDevolucao, BaseReturn<JDPICancelarOrdemDevolucaoResponse>>, CancelarOrdemDevolucaoHandler>(); //PARA CADA USECASE HANDLER
-
+            services.AddScoped<BSMediator>();
+            services.AddHandlers();
 
             #endregion
 
 
             #region Domain Services
 
+            services.AddSingleton<CorrelationIdGenerator>();
+            services.AddScoped<ITransactionFactory, TransactionFactory>();
             services.AddScoped<IValidatorService, ValidatorService>();
             services.AddScoped<ContextAccessorService>();
 
@@ -71,10 +66,32 @@ namespace Configurations
                 options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
                 options.SerializerOptions.WriteIndented = false;
                 options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+                options.SerializerOptions.NumberHandling = JsonNumberHandling.AllowReadingFromString;
+
             });
 
-
             #endregion
+
+            return services;
+        }
+
+        private static IServiceCollection AddHandlers(this IServiceCollection services)
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+
+            var handlerTypes = assembly.GetTypes()
+                .Where(t => t.IsClass && !t.IsAbstract)
+                .Where(t => t.GetInterfaces().Any(i =>
+                    i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IBSRequestHandler<,>)))
+                .ToList();
+
+            foreach (var handlerType in handlerTypes)
+            {
+                var interfaceType = handlerType.GetInterfaces()
+                    .First(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IBSRequestHandler<,>));
+
+                services.AddScoped(interfaceType, handlerType);
+            }
 
             return services;
         }

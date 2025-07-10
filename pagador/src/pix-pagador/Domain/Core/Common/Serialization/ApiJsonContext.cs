@@ -1,5 +1,7 @@
-﻿using Domain.Core.Common.ResultPattern;
+﻿using Domain.Core.Common.Base;
+using Domain.Core.Common.ResultPattern;
 using Domain.Core.Enum;
+using Domain.Core.Exceptions;
 using Domain.Core.Models.JDPI;
 using Domain.Core.Models.Request;
 using Domain.Core.Models.Response;
@@ -17,6 +19,7 @@ namespace Domain.Core.Common.Serialization;
 /// Source Generator Context para otimização de serialização JSON.
 /// Reduz alocações de memória e melhora performance em 40-60%.
 /// </summary>
+/// 
 [JsonSerializable(typeof(BaseReturn<JDPIRegistrarOrdemPagamentoResponse>))]
 [JsonSerializable(typeof(BaseReturn<JDPICancelarOrdemPagamentoResponse>))]
 [JsonSerializable(typeof(BaseReturn<JDPIEfetivarOrdemPagamentoResponse>))]
@@ -43,6 +46,14 @@ namespace Domain.Core.Common.Serialization;
 [JsonSerializable(typeof(JDPIEfetivarOrdemDevolucaoRequest))]
 
 // Response Types
+[JsonSerializable(typeof(BaseResponse<JDPIRegistrarOrdemPagamentoResponse>))]
+[JsonSerializable(typeof(BaseResponse<JDPIEfetivarOrdemPagamentoResponse>))]
+[JsonSerializable(typeof(BaseResponse<JDPICancelarOrdemPagamentoResponse>))]
+[JsonSerializable(typeof(BaseResponse<JDPIRegistrarOrdemDevolucaoResponse>))]
+[JsonSerializable(typeof(BaseResponse<JDPICancelarOrdemDevolucaoResponse>))]
+[JsonSerializable(typeof(BaseResponse<JDPIEfetivarOrdemDevolucaoResponse>))]
+[JsonSerializable(typeof(BaseResponse<string>))]
+[JsonSerializable(typeof(BaseResponse<object>))]
 [JsonSerializable(typeof(JDPIRegistrarOrdemPagamentoResponse))]
 [JsonSerializable(typeof(JDPICancelarOrdemPagamentoResponse))]
 [JsonSerializable(typeof(JDPIEfetivarOrdemPagamentoResponse))]
@@ -79,6 +90,9 @@ namespace Domain.Core.Common.Serialization;
 [JsonSerializable(typeof(decimal))]
 [JsonSerializable(typeof(bool))]
 [JsonSerializable(typeof(DateTime))]
+
+//Error
+[JsonSerializable(typeof(SpsErroReturn))]
 
 // Collections
 [JsonSerializable(typeof(List<string>))]

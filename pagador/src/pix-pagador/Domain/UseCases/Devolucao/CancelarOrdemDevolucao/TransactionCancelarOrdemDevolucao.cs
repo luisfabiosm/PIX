@@ -5,10 +5,10 @@ using Domain.Core.Models.Response;
 
 namespace Domain.UseCases.Devolucao.CancelarOrdemDevolucao
 {
-    public record TransactionCancelarOrdemDevolucao : BaseTransaction<BaseReturn<JDPICancelarOrdemDevolucaoResponse>>
+    public sealed record TransactionCancelarOrdemDevolucao : BaseTransaction<BaseReturn<JDPICancelarOrdemDevolucaoResponse>>
     {
 
-        public string idReqSistemaCliente { get; set; }
+        public string idReqSistemaCliente { get; init; }
 
         public TransactionCancelarOrdemDevolucao()
         {

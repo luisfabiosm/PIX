@@ -5,18 +5,18 @@ using Domain.Core.Models.Response;
 
 namespace Domain.UseCases.Pagamento.EfetivarOrdemPagamento
 {
-    public record TransactionEfetivarOrdemPagamento : BaseTransaction<BaseReturn<JDPIEfetivarOrdemPagamentoResponse>>
+    public sealed record TransactionEfetivarOrdemPagamento : BaseTransaction<BaseReturn<JDPIEfetivarOrdemPagamentoResponse>>
     {
 
-        public string idReqSistemaCliente { get; set; }
+        public string idReqSistemaCliente { get; init; }
 
-        public string idReqJdPi { get; set; }
+        public string idReqJdPi { get; init; }
 
-        public string endToEndId { get; set; }
+        public string endToEndId { get; init; }
 
-        public string dtHrReqJdPi { get; set; }
+        public string dtHrReqJdPi { get; init; }
 
-        public string agendamentoID { get; set; }
+        public string agendamentoID { get; init; }
 
 
         public TransactionEfetivarOrdemPagamento()
