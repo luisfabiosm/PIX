@@ -13,33 +13,29 @@ public record BaseReturn<T>
     [JsonIgnore]
     public Result<T> Result { get; private init; }
 
-    public string CorrelationId { get; private init; }
-
-    // Propriedades para compatibilidade com código existente
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    // ✅ PROPRIEDADES SEMPRE SERIALIZADAS PARA O MIDDLEWARE DETECTAR
+    public string CorrelationId { get; private init; } = string.Empty;
     public bool Success => Result.IsSuccess;
-
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string Message { get; private init; }
-
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int ErrorCode => Result.ErrorCode;
 
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public T Data => Result.IsSuccess ? Result.Value : default;
+    // ✅ PROPRIEDADES CONDICIONAIS
+    public string? Message { get; private init; }
+    public T? Data => Result.IsSuccess ? Result.Value : default;
+    public SpsErroReturn? ErrorDetails { get; private init; }
 
     // Construtores privados para forçar uso dos factory methods
-    private BaseReturn(Result<T> result, string message, string correlationId)
+    private BaseReturn(Result<T> result, string? message, string correlationId, SpsErroReturn? errorDetails = null)
     {
         Result = result;
         Message = message;
-        CorrelationId = correlationId;
+        CorrelationId = correlationId ?? string.Empty;
+        ErrorDetails = errorDetails;
     }
 
     /// <summary>
     /// Cria um retorno de sucesso usando Result Pattern.
     /// </summary>
-    public static BaseReturn<T> FromSuccess(T data, string message = "Success", string correlationId = null)
+    public static BaseReturn<T> FromSuccess(T data, string? message = "Success", string? correlationId = null)
     {
         return new BaseReturn<T>(
             Result<T>.Success(data),
@@ -50,31 +46,34 @@ public record BaseReturn<T>
     /// <summary>
     /// Cria um retorno de erro usando Result Pattern.
     /// </summary>
-    public static BaseReturn<T> FromFailure(string error, int errorCode = -1, string correlationId = null)
+    public static BaseReturn<T> FromFailure(string error, int errorCode = -1, string? correlationId = null, SpsErroReturn? errorDetails = null)
     {
         return new BaseReturn<T>(
             Result<T>.Failure(error, errorCode),
             error,
-            correlationId ?? string.Empty);
+            correlationId ?? string.Empty,
+            errorDetails);
     }
 
     /// <summary>
-    /// Cria um retorno de erro a partir de uma exception (compatibilidade).
+    /// Cria um retorno de erro a partir de uma exception.
+    /// ✅ AUTOMATICAMENTE EXTRAI SpsError DE BusinessException
     /// </summary>
-    public static BaseReturn<T> FromException(Exception exception, string correlationId = null, bool includeDetails = false)
+    public static BaseReturn<T> FromException(Exception exception, string? correlationId = null, bool includeDetails = false)
     {
-        var (message, errorCode, data) = ExtractExceptionInfo(exception, includeDetails);
+        var (message, errorCode, errorDetails) = ExtractExceptionInfo(exception, includeDetails);
 
         return new BaseReturn<T>(
             Result<T>.Failure(message, errorCode),
             message,
-            correlationId ?? string.Empty);
+            correlationId ?? string.Empty,
+            errorDetails);
     }
 
     /// <summary>
     /// Cria um retorno a partir de ValidationResult.
     /// </summary>
-    public static BaseReturn<T> FromValidation(ValidationResult validation, string correlationId = null)
+    public static BaseReturn<T> FromValidation(ValidationResult validation, string? correlationId = null)
     {
         if (validation.IsValid)
             return FromSuccess(default, "Validation passed", correlationId);
@@ -91,24 +90,12 @@ public record BaseReturn<T>
         Func<T, string, TResult> onSuccess,
         Func<string, int, string, TResult> onFailure)
     {
-        //return Result.IsSuccess
-        //    ? onSuccess(Result.Value, CorrelationId)
-        //    : onFailure(Result.Error, Result.ErrorCode, CorrelationId);
-
         if (Result.IsSuccess)
         {
-            //return Result.IsSuccess
-            //    ? onSuccess(Result.Value, CorrelationId)
-            //    : onFailure(Result.Error, Result.ErrorCode, CorrelationId);
-
             return onSuccess(Result.Value, CorrelationId);
         }
         else
         {
-            //return Result.IsSuccess
-            //    ? onSuccess(Result.Value, CorrelationId)
-            //    : onFailure(Result.Error, Result.ErrorCode, CorrelationId);
-
             return onFailure(Result.Error, Result.ErrorCode, CorrelationId);
         }
     }
@@ -129,21 +116,35 @@ public record BaseReturn<T>
         {
             throw Result.ErrorCode switch
             {
-                400 => new BusinessException(Result.Error),//, Result.ErrorCode),
+                400 => new BusinessException(Result.Error),
                 -1 => new ValidateException(Result.Error, Result.ErrorCode, null),
                 _ => new InternalException(Result.Error, Result.ErrorCode, null)
             };
         }
     }
 
-    // Método auxiliar para extrair informações de exceptions
-    private static (string message, int errorCode, object data) ExtractExceptionInfo(Exception exception, bool includeDetails)
+    /// <summary>
+    /// ✅ MÉTODO APRIMORADO PARA EXTRAIR INFORMAÇÕES DE EXCEPTIONS
+    /// </summary>
+    private static (string message, int errorCode, SpsErroReturn? errorDetails) ExtractExceptionInfo(Exception exception, bool includeDetails)
     {
         return exception switch
         {
-            BusinessException businessEx => (businessEx.Message, businessEx.ErrorCode, includeDetails ? businessEx.SpsError : null),
-            InternalException internalEx => (internalEx.Message, internalEx.ErrorCode, includeDetails ? internalEx.erros : null),
-            ValidateException validateEx => (validateEx.Message, validateEx.ErrorCode, validateEx.erros),
+            BusinessException businessEx => (
+                businessEx.Message,
+                businessEx.ErrorCode,
+                businessEx.SpsError // ✅ SEMPRE INCLUI SpsError SE EXISTIR
+            ),
+            InternalException internalEx => (
+                internalEx.Message,
+                internalEx.ErrorCode,
+                null // InternalException não tem SpsError
+            ),
+            ValidateException validateEx => (
+                validateEx.Message,
+                validateEx.ErrorCode,
+                null // ValidateException não tem SpsError
+            ),
             _ => (exception.Message, -1, null)
         };
     }
@@ -151,4 +152,10 @@ public record BaseReturn<T>
     // Conversões implícitas para facilitar uso
     public static implicit operator bool(BaseReturn<T> result) => result.Success;
     public static implicit operator BaseReturn<T>(T data) => FromSuccess(data);
+
+    /// <summary>
+    /// ✅ MÉTODO PARA VERIFICAR SE É BusinessException (usado pelo middleware)
+    /// </summary>
+    [JsonIgnore]
+    public bool IsBusinessException => ErrorDetails != null && ErrorCode == 400;
 }

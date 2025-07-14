@@ -1,5 +1,4 @@
-﻿using Domain.Core.Exceptions;
-using Domain.Core.Ports.Outbound;
+﻿using Domain.Core.Ports.Outbound;
 using Domain.Core.Settings;
 using Microsoft.Extensions.Options;
 using System.Data;
@@ -18,16 +17,6 @@ namespace Domain.Core.Common.Base
             _dbConnection = serviceProvider.GetRequiredService<ISQLConnectionAdapter>();
             _dbsettings = serviceProvider.GetRequiredService<IOptions<DBSettings>>();
         }
-
-        //protected string HandleSpsReturn2(string methodName, string spsReturn)
-        //{
-
-        //   if ( spsReturn.IndexOf("codErro") > 0)
-        //        throw new SPSException(SpsErroReturn.Create(spsReturn));
-
-        //    return spsReturn;
-        //}
-
 
         ~BaseSQLRepository()
         {

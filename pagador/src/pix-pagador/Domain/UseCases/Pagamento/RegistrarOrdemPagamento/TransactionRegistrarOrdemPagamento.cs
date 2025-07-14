@@ -4,8 +4,6 @@ using Domain.Core.Common.Transaction;
 using Domain.Core.Enum;
 using Domain.Core.Models.JDPI;
 using Domain.Core.Models.Response;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace Domain.UseCases.Pagamento.RegistrarOrdemPagamento
 {
@@ -29,13 +27,13 @@ namespace Domain.UseCases.Pagamento.RegistrarOrdemPagamento
         public EnumPrioridadePagamento? prioridadePagamento { get; init; }
 
 
-       
+
         public EnumTpPrioridadePagamento? tpPrioridadePagamento { get; init; }
 
-       
+
         public EnumTipoFinalidade? finalidade { get; init; }
 
-        
+
         public EnumModalidadeAgente? modalidadeAgente { get; init; }
 
         public int? ispbPss { get; init; }
@@ -52,7 +50,7 @@ namespace Domain.UseCases.Pagamento.RegistrarOrdemPagamento
 
         public override string getTransactionSerialization()
         {
-        
+
 
             return this.ToJsonOptimized(JsonOptions.Default);
 

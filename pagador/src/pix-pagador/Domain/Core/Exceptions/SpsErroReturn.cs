@@ -15,10 +15,11 @@ namespace Domain.Core.Exceptions
 
         public static SpsErroReturn Create(int tipo, int codigo, string mensagem, string origem = "")
         {
-            return new SpsErroReturn {
+            return new SpsErroReturn
+            {
 
                 tipoErro = tipo,
-                codErro =  codigo,
+                codErro = codigo,
                 msgErro = mensagem,
                 origemErro = origem
             };
@@ -38,7 +39,7 @@ namespace Domain.Core.Exceptions
                 if (string.IsNullOrWhiteSpace(spsReturn))
                     throw new ValidateException("Mensagem de erro em formato invalido");
 
-                var _spsErro = JsonSerializer.Deserialize<SpsErroReturn>(spsReturn, JsonOptions.Default);        
+                var _spsErro = JsonSerializer.Deserialize<SpsErroReturn>(spsReturn, JsonOptions.Default);
                 return _spsErro;
             }
 

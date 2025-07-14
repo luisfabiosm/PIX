@@ -27,5 +27,5 @@ namespace Domain.Core.Ports.Domain
         TransactionEfetivarOrdemDevolucao CreateEfetivarOrdemDevolucao(
             HttpContext context, JDPIEfetivarOrdemDevolucaoRequest request, string correlationId);
     }
-        
+
 }

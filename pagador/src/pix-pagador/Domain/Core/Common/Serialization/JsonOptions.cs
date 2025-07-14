@@ -1,5 +1,4 @@
-﻿using Domain.Core.Exceptions;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace Domain.Core.Common.Serialization;
@@ -102,7 +101,7 @@ public static class JsonOptions
 
 
 
-   
+
 }
 
 

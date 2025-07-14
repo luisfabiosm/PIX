@@ -66,7 +66,7 @@ namespace Domain.UseCases.Devolucao.RegistrarOrdemDevolucao
 
         protected override BaseReturn<JDPIRegistrarOrdemDevolucaoResponse> ReturnErrorResponse(Exception exception, string correlationId)
         {
-  
+
             return BaseReturn<JDPIRegistrarOrdemDevolucaoResponse>.FromException(exception, correlationId);
         }
 

@@ -1,5 +1,4 @@
-﻿using Domain.Core.Enum;
-using Domain.Core.Models.Request;
+﻿using Domain.Core.Models.Request;
 using Domain.Core.Ports.Domain;
 using Domain.Services;
 using Domain.UseCases.Devolucao.CancelarOrdemDevolucao;
@@ -109,31 +108,31 @@ public class TransactionFactory : ITransactionFactory
     public TransactionCancelarOrdemDevolucao CreateCancelarRegistroOrdemDevolucao(
        HttpContext context, JDPICancelarRegistroOrdemdDevolucaoRequest request, string correlationId)
     {
-            return new TransactionCancelarOrdemDevolucao
-            {
-                CorrelationId = correlationId,
-                Code = 5,
-                idReqSistemaCliente = request.idReqSistemaCliente,
-                canal = _contextAccessor.GetCanal(context),
-                chaveIdempotencia = _contextAccessor.GetChaveIdempotencia(context),
-            };
+        return new TransactionCancelarOrdemDevolucao
+        {
+            CorrelationId = correlationId,
+            Code = 5,
+            idReqSistemaCliente = request.idReqSistemaCliente,
+            canal = _contextAccessor.GetCanal(context),
+            chaveIdempotencia = _contextAccessor.GetChaveIdempotencia(context),
+        };
     }
 
     public TransactionEfetivarOrdemDevolucao CreateEfetivarOrdemDevolucao(
       HttpContext context, JDPIEfetivarOrdemDevolucaoRequest request, string correlationId)
     {
-            return new TransactionEfetivarOrdemDevolucao
-            {
-                CorrelationId = correlationId,
-                Code = 6,
-                idReqSistemaCliente = request.idReqSistemaCliente,
-                canal = _contextAccessor.GetCanal(context),
-                chaveIdempotencia = _contextAccessor.GetChaveIdempotencia(context),
-                idReqJdPi = request.idReqJdPi,
-                endToEndIdOriginal = request.endToEndIdOriginal,
-                endToEndIdDevolucao = request.endToEndIdDevolucao,
-                dtHrReqJdPi = request.dtHrReqJdPi,
-            };
+        return new TransactionEfetivarOrdemDevolucao
+        {
+            CorrelationId = correlationId,
+            Code = 6,
+            idReqSistemaCliente = request.idReqSistemaCliente,
+            canal = _contextAccessor.GetCanal(context),
+            chaveIdempotencia = _contextAccessor.GetChaveIdempotencia(context),
+            idReqJdPi = request.idReqJdPi,
+            endToEndIdOriginal = request.endToEndIdOriginal,
+            endToEndIdDevolucao = request.endToEndIdDevolucao,
+            dtHrReqJdPi = request.dtHrReqJdPi,
+        };
     }
 
 }

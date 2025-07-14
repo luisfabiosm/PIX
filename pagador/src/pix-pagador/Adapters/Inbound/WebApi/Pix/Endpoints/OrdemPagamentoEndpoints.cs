@@ -35,17 +35,8 @@ namespace Adapters.Inbound.WebApi.Pix.Endpoints
 
                     var correlationId = correlationIdGenerator.GenerateWithPrefix("REG");
                     var transaction = transactionFactory.CreateRegistrarOrdemPagamento(httpContext, request, correlationId);
-                    var result = await bSMediator.Send<TransactionRegistrarOrdemPagamento, BaseReturn<JDPIRegistrarOrdemPagamentoResponse>>(transaction);
+                    return await bSMediator.Send<TransactionRegistrarOrdemPagamento, BaseReturn<JDPIRegistrarOrdemPagamentoResponse>>(transaction);
 
-                    return result.Match(
-                        onSuccess: (data, correlId) => Results.Ok(data),
-                        onFailure: (error, errorCode, correlId) => Results.Problem(
-                            detail: error,
-                            statusCode: errorCode == 400 ? 400 : 500,
-                            title: "Erro no processamento",
-                            extensions: new Dictionary<string, object?> { ["correlationId"] = correlId }
-                        )
-                    );
                 })
                 .WithName("Registrar Ordem Pagamento")
                 .WithDescription("Iniciar registrar de Ordem de Pagamento")
@@ -65,17 +56,9 @@ namespace Adapters.Inbound.WebApi.Pix.Endpoints
                 {
                     var correlationId = correlationIdGenerator.GenerateWithPrefix("CAN");
                     var transaction = transactionFactory.CreateCancelarOrdemPagamento(httpContext, request, correlationId);
-                    var result = await bSMediator.Send<TransactionCancelarOrdemPagamento, BaseReturn<JDPICancelarOrdemPagamentoResponse>>(transaction);
+                    return await bSMediator.Send<TransactionCancelarOrdemPagamento, BaseReturn<JDPICancelarOrdemPagamentoResponse>>(transaction);
 
-                    return result.Match(
-                        onSuccess: (data, correlId) => Results.Ok(data),
-                        onFailure: (error, errorCode, correlId) => Results.Problem(
-                            detail: error,
-                            statusCode: errorCode == 400 ? 400 : 500,
-                            title: "Erro no cancelamento",
-                            extensions: new Dictionary<string, object?> { ["correlationId"] = correlId }
-                        )
-                    );
+
                 })
                 .WithName("Cancelar Ordem Pagamento")
                 .WithDescription("Cancelar Ordem de Pagamento registrada")
@@ -92,26 +75,16 @@ namespace Adapters.Inbound.WebApi.Pix.Endpoints
                    [FromServices] ITransactionFactory transactionFactory,
                    [FromServices] CorrelationIdGenerator correlationIdGenerator
                    ) =>
-                        {
-                            var correlationId = correlationIdGenerator.GenerateWithPrefix("EFE");
-                            var transaction = transactionFactory.CreateEfetivarOrdemPagamento(httpContext, request, correlationId);
-                            var result = await bSMediator.Send<TransactionEfetivarOrdemPagamento, BaseReturn<JDPIEfetivarOrdemPagamentoResponse>>(transaction);
-
-                            return result.Match(
-                                onSuccess: (data, correlId) => Results.Ok(data),
-                                onFailure: (error, errorCode, correlId) => Results.Problem(
-                                    detail: error,
-                                    statusCode: errorCode == 400 ? 400 : 500,
-                                    title: "Erro na efetivação",
-                                    extensions: new Dictionary<string, object?> { ["correlationId"] = correlId }
-                                )
-                            );
-                        })
-               .WithName("Efetivar Ordem Pagamento")
-               .WithDescription("Efetivar Ordem de Pagamento registrada")
-               .Produces<JDPIEfetivarOrdemPagamentoResponse>(StatusCodes.Status200OK)
-               .Produces(StatusCodes.Status401Unauthorized)
-               .Produces(StatusCodes.Status400BadRequest);
+             {
+                 var correlationId = correlationIdGenerator.GenerateWithPrefix("EFE");
+                 var transaction = transactionFactory.CreateEfetivarOrdemPagamento(httpContext, request, correlationId);
+                 return await bSMediator.Send<TransactionEfetivarOrdemPagamento, BaseReturn<JDPIEfetivarOrdemPagamentoResponse>>(transaction);
+             })
+             .WithName("Efetivar Ordem Pagamento")
+             .WithDescription("Efetivar Ordem de Pagamento registrada")
+             .Produces<JDPIEfetivarOrdemPagamentoResponse>(StatusCodes.Status200OK)
+             .Produces(StatusCodes.Status401Unauthorized)
+              .Produces(StatusCodes.Status400BadRequest);
         }
     }
 }
