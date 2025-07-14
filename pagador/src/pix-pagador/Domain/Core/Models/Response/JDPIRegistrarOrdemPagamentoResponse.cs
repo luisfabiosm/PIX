@@ -5,10 +5,15 @@ namespace Domain.Core.Models.Response
 {
     public record JDPIRegistrarOrdemPagamentoResponse : BaseTransactionResponse
     {
+
         public double valorCheqEspUtilizado { get; set; }
         public string agendamentoID { get; set; }
         public string comprovante { get; set; }
 
+        public JDPIRegistrarOrdemPagamentoResponse()
+        {
+
+        }
 
         public JDPIRegistrarOrdemPagamentoResponse(string result)
         {

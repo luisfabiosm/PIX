@@ -1,5 +1,4 @@
 ﻿using Domain.Core.Enum;
-using System.Text.Json.Serialization;
 
 namespace Domain.Core.Models.JDPI
 {
@@ -14,6 +13,6 @@ namespace Domain.Core.Models.JDPI
         public EnumTipoConta tpConta { get; set; }
         public string nrConta { get; set; }
 
-        
+
     }
 }

@@ -4,12 +4,9 @@ using Domain.UseCases.Devolucao.RegistrarOrdemDevolucao;
 using Domain.UseCases.Pagamento.CancelarOrdemPagamento;
 using Domain.UseCases.Pagamento.EfetivarOrdemPagamento;
 using Domain.UseCases.Pagamento.RegistrarOrdemPagamento;
-using Microsoft.VisualBasic;
 using System.Buffers;
-using System.Runtime.Intrinsics.X86;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace Domain.Core.Common.Serialization;
 
@@ -53,7 +50,7 @@ public static class JsonExtensions
             ByteArrayPool.Return(rentedBuffer);
         }
     }
- 
+
     /// <summary>
     /// Deserializa JSON string para objeto usando Source Generators otimizados.
     /// </summary>

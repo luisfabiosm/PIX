@@ -13,7 +13,7 @@ namespace Domain.Core.Exceptions
         public SpsErroReturn SpsError = null;
 
 
-        public BusinessException(string mensagem): base(mensagem)
+        public BusinessException(string mensagem) : base(mensagem)
         {
 
         }

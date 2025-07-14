@@ -1,5 +1,4 @@
-﻿using Adapters.Outbound.Logging;
-using Dapper;
+﻿using Dapper;
 using Domain.Core.Common.Base;
 using Domain.Core.Constant;
 using Domain.Core.Ports.Outbound;

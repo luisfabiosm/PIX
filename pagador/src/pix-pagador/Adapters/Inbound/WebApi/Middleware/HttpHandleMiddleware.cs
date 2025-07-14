@@ -1,7 +1,5 @@
-﻿using Domain.Core.Common.ResultPattern;
-using Microsoft.AspNetCore.Http;
+﻿using System.Net;
 using System.Text.Json;
-using System.Net;
 
 namespace Adapters.Inbound.WebApi.Middleware
 {

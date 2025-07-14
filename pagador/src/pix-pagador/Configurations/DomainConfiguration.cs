@@ -1,20 +1,11 @@
 ﻿using Domain.Core.Common.Mediator;
-using Domain.Core.Common.ResultPattern;
 using Domain.Core.Common.Serialization;
 using Domain.Core.Common.Transaction;
-using Domain.Core.Models.Response;
 using Domain.Core.Ports.Domain;
 using Domain.Services;
-using Domain.UseCases.Devolucao.CancelarOrdemDevolucao;
-using Domain.UseCases.Devolucao.EfetivarOrdemDevolucao;
-using Domain.UseCases.Devolucao.RegistrarOrdemDevolucao;
-using Domain.UseCases.Pagamento.CancelarOrdemPagamento;
-using Domain.UseCases.Pagamento.EfetivarOrdemPagamento;
-using Domain.UseCases.Pagamento.RegistrarOrdemPagamento;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using static Domain.Core.Common.Serialization.JsonOptions;
 
 namespace Configurations
 {

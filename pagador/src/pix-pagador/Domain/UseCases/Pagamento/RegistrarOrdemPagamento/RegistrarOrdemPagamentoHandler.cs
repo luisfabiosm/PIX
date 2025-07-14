@@ -78,7 +78,7 @@ public class RegistrarOrdemPagamentoHandler : BSUseCaseHandler<TransactionRegist
             _loggingAdapter.LogError("Erro retornado pela Sps", bex);
             throw;
         }
-        catch (Exception ex) 
+        catch (Exception ex)
         {
             _loggingAdapter.LogError("Erro de database durante registro de ordem de pagamento", ex);
             throw;

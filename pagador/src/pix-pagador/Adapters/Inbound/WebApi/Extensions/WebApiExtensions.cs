@@ -1,11 +1,6 @@
 ﻿using Adapters.Inbound.WebApi.Middleware;
 using Adapters.Inbound.WebApi.Pix.Endpoints;
-using Domain.Core.Common.Serialization;
-using Domain.Core.Common.Transaction;
-using Domain.Core.Ports.Domain;
 using Microsoft.OpenApi.Models;
-using System.Text.Json.Serialization;
-using System.Text.Json;
 
 namespace Adapters.Inbound.WebApi.Extensions
 {
@@ -14,7 +9,7 @@ namespace Adapters.Inbound.WebApi.Extensions
         public static IServiceCollection addWebApiEndpoints(this IServiceCollection services, IConfiguration configuration)
         {
 
-    
+
             services.AddEndpointsApiExplorer();
             services.AddHealthChecks();
             services.AddJwtAuthentication(configuration);
@@ -79,7 +74,7 @@ namespace Adapters.Inbound.WebApi.Extensions
             }
 
             app.UseHttpsRedirection();
-            app.UseHttpHandlingMiddleware();
+            app.UseResultResponseMiddleware();
             app.AddOrdemPagamentoEndpoints();
             app.AddDevolucaoEndpoints();
             app.UseAuthentication();

@@ -1,8 +1,6 @@
-﻿using System.Text.Json.Serialization;
-
-namespace Domain.Core.Enum
+﻿namespace Domain.Core.Enum
 {
-  
+
     public enum EnumTipoDetalhe
     {
         VALOR_RECURSO_EM_ESPECIE_DISPONIBILIZADO = 0,

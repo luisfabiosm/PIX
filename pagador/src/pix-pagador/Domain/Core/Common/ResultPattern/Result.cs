@@ -7,6 +7,7 @@ public readonly struct Result<T>
     public readonly string Error;
     public readonly int ErrorCode;
 
+
     private Result(T value)
     {
         IsSuccess = true;

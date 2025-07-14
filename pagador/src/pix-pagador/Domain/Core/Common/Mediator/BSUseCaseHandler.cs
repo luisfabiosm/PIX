@@ -168,7 +168,7 @@ namespace Domain.Core.Common.Mediator
         /// </summary>
         protected virtual async Task<TResponse> HandleBusinessError(string operation, TTransaction transaction, BusinessException exception, CancellationToken cancellationToken)
         {
-            _loggingAdapter.LogError("Erro não esperado em {Operation}", exception, operation);
+            _loggingAdapter.LogError("Erro de Negocio retornado pela Sps em {Operation}", exception, operation);
             return ReturnErrorResponse(exception, transaction.CorrelationId);
         }
 

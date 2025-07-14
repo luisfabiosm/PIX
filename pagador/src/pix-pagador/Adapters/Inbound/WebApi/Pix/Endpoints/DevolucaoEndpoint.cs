@@ -32,17 +32,7 @@ namespace Adapters.Inbound.WebApi.Pix.Endpoints
             {
                 var correlationId = correlationIdGenerator.GenerateWithPrefix("DEV");
                 var transaction = transactionFactory.CreateRegistrarOrdemDevolucao(httpContext, request, correlationId);
-                var result = await bSMediator.Send<TransactionRegistrarOrdemDevolucao, BaseReturn<JDPIRegistrarOrdemDevolucaoResponse>>(transaction);
-
-                return result.Match(
-                    onSuccess: (data, correlId) => Results.Ok(data),
-                    onFailure: (error, errorCode, correlId) => Results.Problem(
-                        detail: error,
-                        statusCode: errorCode == 400 ? 400 : 500,
-                        title: "Erro na requisição de devolução",
-                        extensions: new Dictionary<string, object?> { ["correlationId"] = correlId }
-                    )
-                );
+                return await bSMediator.Send<TransactionRegistrarOrdemDevolucao, BaseReturn<JDPIRegistrarOrdemDevolucaoResponse>>(transaction);
 
             })
                   .WithName("Requisitar Ordem Devolução")
@@ -64,17 +54,7 @@ namespace Adapters.Inbound.WebApi.Pix.Endpoints
             {
                 var correlationId = correlationIdGenerator.GenerateWithPrefix("CDEV");
                 var transaction = transactionFactory.CreateCancelarRegistroOrdemDevolucao(httpContext, request, correlationId);
-                var result = await bSMediator.Send<TransactionCancelarOrdemDevolucao, BaseReturn<JDPICancelarOrdemDevolucaoResponse>>(transaction);
-
-                return result.Match(
-                    onSuccess: (data, correlId) => Results.Ok(data),
-                    onFailure: (error, errorCode, correlId) => Results.Problem(
-                        detail: error,
-                        statusCode: errorCode == 400 ? 400 : 500,
-                        title: "Erro no cancelamento de devolução",
-                        extensions: new Dictionary<string, object?> { ["correlationId"] = correlId }
-                    )
-                );
+                return await bSMediator.Send<TransactionCancelarOrdemDevolucao, BaseReturn<JDPICancelarOrdemDevolucaoResponse>>(transaction);
             })
                   .WithName("Cancelar Ordem Devolução")
                   .WithDescription("Cancelar Ordem de Devolução iniciada")
@@ -95,17 +75,8 @@ namespace Adapters.Inbound.WebApi.Pix.Endpoints
             {
                 var correlationId = correlationIdGenerator.GenerateWithPrefix("EDEV");
                 var transaction = transactionFactory.CreateEfetivarOrdemDevolucao(httpContext, request, correlationId);
-                var result = await bSMediator.Send<TransactionEfetivarOrdemDevolucao, BaseReturn<JDPIEfetivarOrdemDevolucaoResponse>>(transaction);
+                return await bSMediator.Send<TransactionEfetivarOrdemDevolucao, BaseReturn<JDPIEfetivarOrdemDevolucaoResponse>>(transaction);
 
-                return result.Match(
-                    onSuccess: (data, correlId) => Results.Ok(data),
-                    onFailure: (error, errorCode, correlId) => Results.Problem(
-                        detail: error,
-                        statusCode: errorCode == 400 ? 400 : 500,
-                        title: "Erro na efetivação de devolução",
-                        extensions: new Dictionary<string, object?> { ["correlationId"] = correlId }
-                    )
-                );
             })
                .WithName("Efetivar Ordem Devolução")
                .WithDescription("Efetivar Ordem de Devolução registrada")
