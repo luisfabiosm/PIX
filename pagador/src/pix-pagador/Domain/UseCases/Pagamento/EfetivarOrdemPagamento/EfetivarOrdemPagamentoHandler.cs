@@ -35,8 +35,12 @@ namespace Domain.UseCases.Pagamento.EfetivarOrdemPagamento
             try
             {
                 var result = await _spaRepoSql.EfetivarOrdemPagamento(transaction);
-                var handledResult = await HandleProcessingResult(result.result, result.exception);
-                return new JDPIEfetivarOrdemPagamentoResponse(handledResult);
+                return new JDPIEfetivarOrdemPagamentoResponse(result);
+            }
+            catch (BusinessException bex)
+            {
+                _loggingAdapter.LogError("Erro retornado pela Sps", bex);
+                throw;
             }
             catch (Exception dbEx)
             {

@@ -80,7 +80,7 @@ namespace Adapters.Inbound.WebApi.Extensions
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapHealthChecks("/health");
-
+            app.AddMonitorEndpoints();
             app.Run();
         }
     }

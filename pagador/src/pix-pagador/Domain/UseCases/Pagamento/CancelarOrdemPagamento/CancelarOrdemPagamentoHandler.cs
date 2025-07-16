@@ -35,8 +35,12 @@ namespace Domain.UseCases.Pagamento.CancelarOrdemPagamento
             try
             {
                 var result = await _spaRepoSql.CancelarOrdemPagamento(transaction);
-                var handledResult = await HandleProcessingResult(result.result, result.exception);
-                return new JDPICancelarOrdemPagamentoResponse(handledResult);
+                return new JDPICancelarOrdemPagamentoResponse(result);
+            }
+            catch (BusinessException bex)
+            {
+                _loggingAdapter.LogError("Erro retornado pela Sps", bex);
+                throw;
             }
             catch (Exception dbEx)
             {
@@ -56,9 +60,7 @@ namespace Domain.UseCases.Pagamento.CancelarOrdemPagamento
         }
 
 
-        /// <summary>
-        /// ✅ REFATORADO: Retorno de erro usando Result Pattern
-        /// </summary>
+
         protected override BaseReturn<JDPICancelarOrdemPagamentoResponse> ReturnErrorResponse(Exception exception, string correlationId)
         {
             return BaseReturn<JDPICancelarOrdemPagamentoResponse>.FromException(exception, correlationId);
