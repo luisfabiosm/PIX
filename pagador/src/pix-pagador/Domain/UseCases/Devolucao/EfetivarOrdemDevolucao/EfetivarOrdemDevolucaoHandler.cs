@@ -39,8 +39,12 @@ namespace Domain.UseCases.Devolucao.EfetivarOrdemDevolucao
             try
             {
                 var result = await _spaRepoSql.EfetivarOrdemDevolucao(transaction);
-                var handledResult = await HandleProcessingResult(result.result, result.exception);
-                return new JDPIEfetivarOrdemDevolucaoResponse(handledResult);
+                return new JDPIEfetivarOrdemDevolucaoResponse(result);
+            }
+            catch (BusinessException bex)
+            {
+                _loggingAdapter.LogError("Erro retornado pela Sps", bex);
+                throw;
             }
             catch (Exception dbEx)
             {

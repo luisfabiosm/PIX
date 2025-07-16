@@ -48,20 +48,6 @@ namespace Configurations
 
             #endregion
 
-            #region JSON Serialization Optimization
-
-            // Configurar Source Generators para System.Text.Json
-            services.ConfigureHttpJsonOptions(options =>
-            {
-                options.SerializerOptions.TypeInfoResolver = ApiJsonContext.Default;
-                options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-                options.SerializerOptions.WriteIndented = false;
-                options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-                options.SerializerOptions.NumberHandling = JsonNumberHandling.AllowReadingFromString;
-
-            });
-
-            #endregion
 
             return services;
         }

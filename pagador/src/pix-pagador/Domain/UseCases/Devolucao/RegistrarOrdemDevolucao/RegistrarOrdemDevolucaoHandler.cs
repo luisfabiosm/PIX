@@ -43,8 +43,12 @@ namespace Domain.UseCases.Devolucao.RegistrarOrdemDevolucao
             try
             {
                 var result = await _spaRepoSql.RegistrarOrdemDevolucao(transaction);
-                var handledResult = await HandleProcessingResult(result.result, result.exception);
-                return new JDPIRegistrarOrdemDevolucaoResponse(handledResult);
+                return new JDPIRegistrarOrdemDevolucaoResponse(result);
+            }
+            catch (BusinessException bex)
+            {
+                _loggingAdapter.LogError("Erro retornado pela Sps", bex);
+                throw;
             }
             catch (Exception dbEx)
             {

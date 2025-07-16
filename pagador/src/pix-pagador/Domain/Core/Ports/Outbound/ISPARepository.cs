@@ -13,15 +13,15 @@ namespace Domain.Core.Ports.Outbound
 
         ValueTask<string> RegistrarOrdemPagamento(TransactionRegistrarOrdemPagamento transaction);
 
-        ValueTask<(string result, Exception exception)> EfetivarOrdemPagamento(TransactionEfetivarOrdemPagamento transaction);
+        ValueTask<string> EfetivarOrdemPagamento(TransactionEfetivarOrdemPagamento transaction);
 
-        ValueTask<(string result, Exception exception)> CancelarOrdemPagamento(TransactionCancelarOrdemPagamento transaction);
+        ValueTask<string> CancelarOrdemPagamento(TransactionCancelarOrdemPagamento transaction);
 
-        ValueTask<(string result, Exception exception)> RegistrarOrdemDevolucao(TransactionRegistrarOrdemDevolucao transaction);
+        ValueTask<string> RegistrarOrdemDevolucao(TransactionRegistrarOrdemDevolucao transaction);
 
-        ValueTask<(string result, Exception exception)> EfetivarOrdemDevolucao(TransactionEfetivarOrdemDevolucao transaction);
+        ValueTask<string> EfetivarOrdemDevolucao(TransactionEfetivarOrdemDevolucao transaction);
 
-        ValueTask<(string result, Exception exception)> CancelarOrdemDevolucao(TransactionCancelarOrdemDevolucao transaction);
+        ValueTask<string> CancelarOrdemDevolucao(TransactionCancelarOrdemDevolucao transaction);
 
     }
 }

@@ -58,7 +58,6 @@ namespace Adapters.Inbound.WebApi.Pix.Endpoints
                     var transaction = transactionFactory.CreateCancelarOrdemPagamento(httpContext, request, correlationId);
                     return await bSMediator.Send<TransactionCancelarOrdemPagamento, BaseReturn<JDPICancelarOrdemPagamentoResponse>>(transaction);
 
-
                 })
                 .WithName("Cancelar Ordem Pagamento")
                 .WithDescription("Cancelar Ordem de Pagamento registrada")

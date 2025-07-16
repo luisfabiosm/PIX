@@ -1,6 +1,9 @@
 ﻿
 using Adapters.Inbound.WebApi.Extensions;
+using Domain.Core.Common.Serialization;
 using Domain.Core.Settings;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 
 
@@ -18,6 +21,7 @@ namespace Configurations
             services.ConfigureInboundAdapters(configuration);
             services.ConfigureOutboundAdapters(configuration);
             services.ConfigureDomainAdapters(configuration);
+            services.ConfigureSerializeJsonOptions();
 
             return services;
         }

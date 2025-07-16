@@ -20,44 +20,37 @@ namespace Adapters.Outbound.Database.SQL
 
         }
 
-        public async ValueTask<(string result, Exception exception)> EfetivarOrdemPagamento(TransactionEfetivarOrdemPagamento transaction)
+        public async ValueTask<string> EfetivarOrdemPagamento(TransactionEfetivarOrdemPagamento transaction)
         {
-            try
+            using var operationContext = _loggingAdapter.StartOperation("EfetivarPagamento", transaction.CorrelationId);
+            string _mensagemPixOut = string.Empty;
+
+            _loggingAdapter.AddProperty("Chave Idempotencia", transaction.chaveIdempotencia);
+
+            await _dbConnection.ExecuteWithRetryAsync(async (_connection) =>
             {
 
-                using var operationContext = _loggingAdapter.StartOperation("EfetivarPagamento", transaction.CorrelationId);
-                string _mensagemPixOut = string.Empty;
+                var _parameters = new DynamicParameters();
+                _parameters.Add("@pvchOperador", OperationConstants.DEFAULT_OPERADOR);
+                _parameters.Add("@ptinCanal", byte.Parse(transaction.canal.ToString()));
+                _parameters.Add("@psmlAgencia", OperationConstants.DEFAULT_AGENCIA);
+                _parameters.Add("@ptinPosto", OperationConstants.DEFAULT_POSTO);
+                _parameters.Add("@pvchEstacao", OperationConstants.DEFAULT_ESTACAO);
+                _parameters.Add("@pvchChvIdemPotencia", transaction.chaveIdempotencia);
+                _parameters.Add("@pvchMsgPixIN", transaction.getTransactionSerialization());
 
-                _loggingAdapter.AddProperty("Chave Idempotencia", transaction.chaveIdempotencia);
+                // Parâmetro de saída
+                _parameters.Add("@pvchMsgPixOUT", dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 4000);
 
-                await _dbConnection.ExecuteWithRetryAsync(async (_connection) =>
-                {
+                await _connection.ExecuteAsync("sps_PixDebito", _parameters,
+                        commandTimeout: _dbsettings.Value.CommandTimeout,
+                        commandType: CommandType.StoredProcedure);
 
-                    var _parameters = new DynamicParameters();
-                    _parameters.Add("@pvchOperador", OperationConstants.DEFAULT_OPERADOR);
-                    _parameters.Add("@ptinCanal", byte.Parse(transaction.canal.ToString()));
-                    _parameters.Add("@psmlAgencia", OperationConstants.DEFAULT_AGENCIA);
-                    _parameters.Add("@ptinPosto", OperationConstants.DEFAULT_POSTO);
-                    _parameters.Add("@pvchEstacao", OperationConstants.DEFAULT_ESTACAO);
-                    _parameters.Add("@pvchChvIdemPotencia", transaction.chaveIdempotencia);
-                    _parameters.Add("@pvchMsgPixIN", transaction.getTransactionSerialization());
+                _mensagemPixOut = _parameters.Get<string>("@pvchMsgPixOUT");
+            });
 
-                    // Parâmetro de saída
-                    _parameters.Add("@pvchMsgPixOUT", dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 4000);
+            return _mensagemPixOut;
 
-                    await _connection.ExecuteAsync("sps_PixDebito", _parameters,
-                            commandTimeout: _dbsettings.Value.CommandTimeout,
-                            commandType: CommandType.StoredProcedure);
-
-                    _mensagemPixOut = _parameters.Get<string>("@pvchMsgPixOUT");
-                });
-
-                return (_mensagemPixOut, null);
-            }
-            catch (Exception ex)
-            {
-                return HandleException("EfetivarOrdemPagamento", ex);
-            }
         }
 
 
@@ -108,169 +101,140 @@ namespace Adapters.Outbound.Database.SQL
         }
 
 
-        public async ValueTask<(string result, Exception exception)> CancelarOrdemPagamento(TransactionCancelarOrdemPagamento transaction)
+        public async ValueTask<string> CancelarOrdemPagamento(TransactionCancelarOrdemPagamento transaction)
         {
-            try
+
+            using var operationContext = _loggingAdapter.StartOperation("CancelarPagamento", transaction.CorrelationId);
+            string _mensagemPixOut = string.Empty;
+
+            _loggingAdapter.AddProperty("Chave Idempotencia", transaction.chaveIdempotencia);
+
+            await _dbConnection.ExecuteWithRetryAsync(async (_connection) =>
             {
 
-                using var operationContext = _loggingAdapter.StartOperation("CancelarPagamento", transaction.CorrelationId);
-                string _mensagemPixOut = string.Empty;
+                var _parameters = new DynamicParameters();
+                _parameters.Add("@pvchOperador", OperationConstants.DEFAULT_OPERADOR);
+                _parameters.Add("@ptinCanal", byte.Parse(transaction.canal.ToString()));
+                _parameters.Add("@psmlAgencia", OperationConstants.DEFAULT_AGENCIA);
+                _parameters.Add("@ptinPosto", OperationConstants.DEFAULT_POSTO);
+                _parameters.Add("@pvchEstacao", OperationConstants.DEFAULT_ESTACAO);
+                _parameters.Add("@pvchChvIdemPotencia", transaction.chaveIdempotencia);
+                _parameters.Add("@pvchMsgPixIN", transaction.getTransactionSerialization());
 
-                _loggingAdapter.AddProperty("Chave Idempotencia", transaction.chaveIdempotencia);
+                // Parâmetro de saída
+                _parameters.Add("@pvchMsgPixOUT", dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 4000);
 
-                await _dbConnection.ExecuteWithRetryAsync(async (_connection) =>
-                {
+                await _connection.ExecuteAsync("sps_PixDesbloqueioSaldo", _parameters,
+                        commandTimeout: _dbsettings.Value.CommandTimeout,
+                        commandType: CommandType.StoredProcedure);
 
-                    var _parameters = new DynamicParameters();
-                    _parameters.Add("@pvchOperador", OperationConstants.DEFAULT_OPERADOR);
-                    _parameters.Add("@ptinCanal", byte.Parse(transaction.canal.ToString()));
-                    _parameters.Add("@psmlAgencia", OperationConstants.DEFAULT_AGENCIA);
-                    _parameters.Add("@ptinPosto", OperationConstants.DEFAULT_POSTO);
-                    _parameters.Add("@pvchEstacao", OperationConstants.DEFAULT_ESTACAO);
-                    _parameters.Add("@pvchChvIdemPotencia", transaction.chaveIdempotencia);
-                    _parameters.Add("@pvchMsgPixIN", transaction.getTransactionSerialization());
+                _mensagemPixOut = _parameters.Get<string>("@pvchMsgPixOUT");
+            });
 
-                    // Parâmetro de saída
-                    _parameters.Add("@pvchMsgPixOUT", dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 4000);
-
-                    await _connection.ExecuteAsync("sps_PixDesbloqueioSaldo", _parameters,
-                            commandTimeout: _dbsettings.Value.CommandTimeout,
-                            commandType: CommandType.StoredProcedure);
-
-                    _mensagemPixOut = _parameters.Get<string>("@pvchMsgPixOUT");
-                });
-
-                return (_mensagemPixOut, null);
-            }
-            catch (Exception ex)
-            {
-                return HandleException("CancelarOrdemPagamento", ex);
-            }
+            return _mensagemPixOut;
 
         }
 
 
-        public async ValueTask<(string result, Exception exception)> RegistrarOrdemDevolucao(TransactionRegistrarOrdemDevolucao transaction)
+        public async ValueTask<string> RegistrarOrdemDevolucao(TransactionRegistrarOrdemDevolucao transaction)
         {
-            try
+
+            using var operationContext = _loggingAdapter.StartOperation("IniciarDevolucao", transaction.CorrelationId);
+            string _mensagemPixOut = string.Empty;
+
+            _loggingAdapter.AddProperty("Chave Idempotencia", transaction.chaveIdempotencia);
+
+            await _dbConnection.ExecuteWithRetryAsync(async (_connection) =>
             {
 
-                using var operationContext = _loggingAdapter.StartOperation("IniciarDevolucao", transaction.CorrelationId);
-                string _mensagemPixOut = string.Empty;
+                var _parameters = new DynamicParameters();
+                _parameters.Add("@pvchOperador", OperationConstants.DEFAULT_OPERADOR);
+                _parameters.Add("@ptinCanal", byte.Parse(transaction.canal.ToString()));
+                _parameters.Add("@psmlAgencia", OperationConstants.DEFAULT_AGENCIA);
+                _parameters.Add("@ptinPosto", OperationConstants.DEFAULT_POSTO);
+                _parameters.Add("@pvchEstacao", OperationConstants.DEFAULT_ESTACAO);
+                _parameters.Add("@pvchChvIdemPotencia", transaction.chaveIdempotencia);
+                _parameters.Add("@pvchMsgPixIN", transaction.getTransactionSerialization());
 
-                _loggingAdapter.AddProperty("Chave Idempotencia", transaction.chaveIdempotencia);
+                // Parâmetro de saída
+                _parameters.Add("@pvchMsgPixOUT", dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 4000);
 
-                await _dbConnection.ExecuteWithRetryAsync(async (_connection) =>
-                {
+                await _connection.ExecuteAsync("sps_PixBloqueioSaldoDevolucao", _parameters,
+                        commandTimeout: _dbsettings.Value.CommandTimeout,
+                        commandType: CommandType.StoredProcedure);
 
-                    var _parameters = new DynamicParameters();
-                    _parameters.Add("@pvchOperador", OperationConstants.DEFAULT_OPERADOR);
-                    _parameters.Add("@ptinCanal", byte.Parse(transaction.canal.ToString()));
-                    _parameters.Add("@psmlAgencia", OperationConstants.DEFAULT_AGENCIA);
-                    _parameters.Add("@ptinPosto", OperationConstants.DEFAULT_POSTO);
-                    _parameters.Add("@pvchEstacao", OperationConstants.DEFAULT_ESTACAO);
-                    _parameters.Add("@pvchChvIdemPotencia", transaction.chaveIdempotencia);
-                    _parameters.Add("@pvchMsgPixIN", transaction.getTransactionSerialization());
+                _mensagemPixOut = _parameters.Get<string>("@pvchMsgPixOUT");
+            });
 
-                    // Parâmetro de saída
-                    _parameters.Add("@pvchMsgPixOUT", dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 4000);
-
-                    await _connection.ExecuteAsync("sps_PixBloqueioSaldoDevolucao", _parameters,
-                            commandTimeout: _dbsettings.Value.CommandTimeout,
-                            commandType: CommandType.StoredProcedure);
-
-                    _mensagemPixOut = _parameters.Get<string>("@pvchMsgPixOUT");
-                });
-
-                return (_mensagemPixOut, null);
-            }
-            catch (Exception ex)
-            {
-                return HandleException("RegistrarOrdemDevolucao", ex);
-            }
+            return _mensagemPixOut;
 
         }
 
 
-        public async ValueTask<(string result, Exception exception)> EfetivarOrdemDevolucao(TransactionEfetivarOrdemDevolucao transaction)
+        public async ValueTask<string> EfetivarOrdemDevolucao(TransactionEfetivarOrdemDevolucao transaction)
         {
-            try
+            using var operationContext = _loggingAdapter.StartOperation("EfetivarDevolucao", transaction.CorrelationId);
+            string _mensagemPixOut = string.Empty;
+
+            _loggingAdapter.AddProperty("Chave Idempotencia", transaction.chaveIdempotencia);
+
+            await _dbConnection.ExecuteWithRetryAsync(async (_connection) =>
             {
 
-                using var operationContext = _loggingAdapter.StartOperation("EfetivarDevolucao", transaction.CorrelationId);
-                string _mensagemPixOut = string.Empty;
+                var _parameters = new DynamicParameters();
+                _parameters.Add("@pvchOperador", OperationConstants.DEFAULT_OPERADOR);
+                _parameters.Add("@ptinCanal", byte.Parse(transaction.canal.ToString()));
+                _parameters.Add("@psmlAgencia", OperationConstants.DEFAULT_AGENCIA);
+                _parameters.Add("@ptinPosto", OperationConstants.DEFAULT_POSTO);
+                _parameters.Add("@pvchEstacao", OperationConstants.DEFAULT_ESTACAO);
+                _parameters.Add("@pvchChvIdemPotencia", transaction.chaveIdempotencia);
+                _parameters.Add("@pvchMsgPixIN", transaction.getTransactionSerialization());
 
-                _loggingAdapter.AddProperty("Chave Idempotencia", transaction.chaveIdempotencia);
+                // Parâmetro de saída
+                _parameters.Add("@pvchMsgPixOUT", dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 4000);
 
-                await _dbConnection.ExecuteWithRetryAsync(async (_connection) =>
-                {
+                await _connection.ExecuteAsync("sps_PixDevolucaoCredito", _parameters,
+                        commandTimeout: _dbsettings.Value.CommandTimeout,
+                        commandType: CommandType.StoredProcedure);
 
-                    var _parameters = new DynamicParameters();
-                    _parameters.Add("@pvchOperador", OperationConstants.DEFAULT_OPERADOR);
-                    _parameters.Add("@ptinCanal", byte.Parse(transaction.canal.ToString()));
-                    _parameters.Add("@psmlAgencia", OperationConstants.DEFAULT_AGENCIA);
-                    _parameters.Add("@ptinPosto", OperationConstants.DEFAULT_POSTO);
-                    _parameters.Add("@pvchEstacao", OperationConstants.DEFAULT_ESTACAO);
-                    _parameters.Add("@pvchChvIdemPotencia", transaction.chaveIdempotencia);
-                    _parameters.Add("@pvchMsgPixIN", transaction.getTransactionSerialization());
+                _mensagemPixOut = _parameters.Get<string>("@pvchMsgPixOUT");
+            });
 
-                    // Parâmetro de saída
-                    _parameters.Add("@pvchMsgPixOUT", dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 4000);
-
-                    await _connection.ExecuteAsync("sps_PixDevolucaoCredito", _parameters,
-                            commandTimeout: _dbsettings.Value.CommandTimeout,
-                            commandType: CommandType.StoredProcedure);
-
-                    _mensagemPixOut = _parameters.Get<string>("@pvchMsgPixOUT");
-                });
-
-                return (_mensagemPixOut, null);
-            }
-            catch (Exception ex)
-            {
-                return HandleException("EfetivarOrdemDevolucao", ex);
-            }
+            return _mensagemPixOut;
         }
 
 
-        public async ValueTask<(string result, Exception exception)> CancelarOrdemDevolucao(TransactionCancelarOrdemDevolucao transaction)
+        public async ValueTask<string> CancelarOrdemDevolucao(TransactionCancelarOrdemDevolucao transaction)
         {
-            try
+            using var operationContext = _loggingAdapter.StartOperation("CancelarDevolucao", transaction.CorrelationId);
+            string _mensagemPixOut = string.Empty;
+
+            _loggingAdapter.AddProperty("Chave Idempotencia", transaction.chaveIdempotencia);
+
+            await _dbConnection.ExecuteWithRetryAsync(async (_connection) =>
             {
 
-                using var operationContext = _loggingAdapter.StartOperation("CancelarDevolucao", transaction.CorrelationId);
-                string _mensagemPixOut = string.Empty;
+                var _parameters = new DynamicParameters();
+                _parameters.Add("@pvchOperador", OperationConstants.DEFAULT_OPERADOR);
+                _parameters.Add("@ptinCanal", byte.Parse(transaction.canal.ToString()));
+                _parameters.Add("@psmlAgencia", OperationConstants.DEFAULT_AGENCIA);
+                _parameters.Add("@ptinPosto", OperationConstants.DEFAULT_POSTO);
+                _parameters.Add("@pvchEstacao", OperationConstants.DEFAULT_ESTACAO);
+                _parameters.Add("@pvchChvIdemPotencia", transaction.chaveIdempotencia);
+                _parameters.Add("@pvchMsgPixIN", transaction.getTransactionSerialization());
 
-                _loggingAdapter.AddProperty("Chave Idempotencia", transaction.chaveIdempotencia);
+                // Parâmetro de saída
+                _parameters.Add("@pvchMsgPixOUT", dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 4000);
 
-                await _dbConnection.ExecuteWithRetryAsync(async (_connection) =>
-                {
+                await _connection.ExecuteAsync("sps_PixDesbloqueioSaldoDevolucao", _parameters,
+                        commandTimeout: _dbsettings.Value.CommandTimeout,
+                        commandType: CommandType.StoredProcedure);
 
-                    var _parameters = new DynamicParameters();
-                    _parameters.Add("@pvchOperador", OperationConstants.DEFAULT_OPERADOR);
-                    _parameters.Add("@ptinCanal", byte.Parse(transaction.canal.ToString()));
-                    _parameters.Add("@psmlAgencia", OperationConstants.DEFAULT_AGENCIA);
-                    _parameters.Add("@ptinPosto", OperationConstants.DEFAULT_POSTO);
-                    _parameters.Add("@pvchEstacao", OperationConstants.DEFAULT_ESTACAO);
-                    _parameters.Add("@pvchChvIdemPotencia", transaction.chaveIdempotencia);
-                    _parameters.Add("@pvchMsgPixIN", transaction.getTransactionSerialization());
+                _mensagemPixOut = _parameters.Get<string>("@pvchMsgPixOUT");
+            });
 
-                    // Parâmetro de saída
-                    _parameters.Add("@pvchMsgPixOUT", dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 4000);
+            return _mensagemPixOut;
 
-                    await _connection.ExecuteAsync("sps_PixDesbloqueioSaldoDevolucao", _parameters,
-                            commandTimeout: _dbsettings.Value.CommandTimeout,
-                            commandType: CommandType.StoredProcedure);
-
-                    _mensagemPixOut = _parameters.Get<string>("@pvchMsgPixOUT");
-                });
-
-                return (_mensagemPixOut, null);
-            }
-            catch (Exception ex)
-            {
-                return HandleException("CancelarOrdemDevolucao", ex);
-            }
         }
 
 

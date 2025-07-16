@@ -6,11 +6,13 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>553e1aa7-c5fa-4900-8c7a-0ab4e69488fe</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-    <ServerGarbageCollection>false</ServerGarbageCollection>
-    <Version>2.0.0</Version>
+    <Version>2.0.1</Version>
     <AssemblyName>Pagador.WebAPI</AssemblyName>
     <RootNamespace />
     <DockerfileContext>..\..</DockerfileContext>
+    <ServerGarbageCollection>true</ServerGarbageCollection>
+    <InvariantGlobalization>false</InvariantGlobalization>
+   
   </PropertyGroup>
 
   <ItemGroup>

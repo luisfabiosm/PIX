@@ -34,8 +34,12 @@ namespace Domain.UseCases.Devolucao.CancelarOrdemDevolucao
             try
             {
                 var result = await _spaRepoSql.CancelarOrdemDevolucao(transaction);
-                var handledResult = await HandleProcessingResult(result.result, result.exception);
-                return new JDPICancelarOrdemDevolucaoResponse(handledResult);
+                return new JDPICancelarOrdemDevolucaoResponse(result);
+            }
+            catch (BusinessException bex)
+            {
+                _loggingAdapter.LogError("Erro retornado pela Sps", bex);
+                throw;
             }
             catch (Exception dbEx)
             {
