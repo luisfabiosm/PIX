@@ -11,6 +11,6 @@ public record JDPIRequisitarDevolucaoOrdemPagtoRequest
     public string codigoDevolucao { get; set; }
     public string motivoDevolucao { get; set; }
     public double valorDevolucao { get; set; }
-    public JDPIDadosContaPagador pagador { get; set; }
-    public JDPIDadosContaRecebedor recebedor { get; set; }
+    public JDPIDadosConta pagador { get; set; }
+    public JDPIDadosConta recebedor { get; set; }
 }

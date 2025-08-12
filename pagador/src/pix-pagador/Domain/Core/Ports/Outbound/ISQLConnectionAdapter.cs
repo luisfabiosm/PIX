@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Data.Common;
 
 namespace Domain.Core.Ports.Outbound
 {
@@ -7,6 +8,7 @@ namespace Domain.Core.Ports.Outbound
 
         void SetCorrelationId(string correlationId);
 
+        ConnectionState GetConnectionState() ;
 
         Task<IDbConnection> GetConnectionAsync(CancellationToken cancellationToken = default);
 

@@ -6,11 +6,11 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>553e1aa7-c5fa-4900-8c7a-0ab4e69488fe</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-    <Version>2.0.1</Version>
+    <Version>2.0.2</Version>
     <AssemblyName>Pagador.WebAPI</AssemblyName>
     <RootNamespace />
     <DockerfileContext>..\..</DockerfileContext>
-    <ServerGarbageCollection>true</ServerGarbageCollection>
+    <ServerGarbageCollection>false</ServerGarbageCollection>
     <InvariantGlobalization>false</InvariantGlobalization>
    
   </PropertyGroup>
@@ -33,14 +33,12 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1-Preview.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.15" />
-    <PackageReference Include="MongoDB.Driver" Version="3.3.0" />
     <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.11.2" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.11.1" />
     <PackageReference Include="Polly.Contrib.WaitAndRetry" Version="1.1.1" />
     <PackageReference Include="Serilog.Enrichers.Span" Version="3.1.0" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="9.0.1" />
     <PackageReference Include="Serilog.Settings.Configuration" Version="9.0.1-dev-02317" />
-    <PackageReference Include="Npgsql" Version="9.0.3" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
 
 

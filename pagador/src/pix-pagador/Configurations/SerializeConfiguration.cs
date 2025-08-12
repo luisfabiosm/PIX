@@ -1,4 +1,5 @@
 ﻿using Domain.Core.Common.Serialization;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
@@ -28,8 +29,9 @@ namespace Configurations
             options.PropertyNameCaseInsensitive = true;
             options.AllowTrailingCommas = true;
             options.ReadCommentHandling = JsonCommentHandling.Skip;
-
-            //options.TypeInfoResolver = ApiJsonContext.Default;
+            options.Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
+      
+            
 
             try
             {

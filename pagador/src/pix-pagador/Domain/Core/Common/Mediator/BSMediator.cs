@@ -3,9 +3,6 @@
 namespace Domain.Core.Common.Mediator;
 
 
-/// <summary>
-/// Mediator otimizado com cache de handlers para melhor performance.
-/// </summary>
 public class BSMediator
 {
     private readonly IServiceProvider _serviceProvider;

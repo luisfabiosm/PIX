@@ -36,7 +36,6 @@ namespace Adapters.Outbound.Database.SQL
                 _parameters.Add("@psmlAgencia", OperationConstants.DEFAULT_AGENCIA);
                 _parameters.Add("@ptinPosto", OperationConstants.DEFAULT_POSTO);
                 _parameters.Add("@pvchEstacao", OperationConstants.DEFAULT_ESTACAO);
-                _parameters.Add("@pvchChvIdemPotencia", transaction.chaveIdempotencia);
                 _parameters.Add("@pvchMsgPixIN", transaction.getTransactionSerialization());
 
                 // Parâmetro de saída
@@ -97,7 +96,7 @@ namespace Adapters.Outbound.Database.SQL
                 _mensagemPixOut = _parameters.Get<string>("@pvchMsgPixOUT");
             });
 
-            return _mensagemPixOut;// HandleSpsReturn2("RegistrarOrdemPagamento", _mensagemPixOut);
+            return _mensagemPixOut;
         }
 
 
@@ -118,7 +117,6 @@ namespace Adapters.Outbound.Database.SQL
                 _parameters.Add("@psmlAgencia", OperationConstants.DEFAULT_AGENCIA);
                 _parameters.Add("@ptinPosto", OperationConstants.DEFAULT_POSTO);
                 _parameters.Add("@pvchEstacao", OperationConstants.DEFAULT_ESTACAO);
-                _parameters.Add("@pvchChvIdemPotencia", transaction.chaveIdempotencia);
                 _parameters.Add("@pvchMsgPixIN", transaction.getTransactionSerialization());
 
                 // Parâmetro de saída
@@ -187,7 +185,6 @@ namespace Adapters.Outbound.Database.SQL
                 _parameters.Add("@psmlAgencia", OperationConstants.DEFAULT_AGENCIA);
                 _parameters.Add("@ptinPosto", OperationConstants.DEFAULT_POSTO);
                 _parameters.Add("@pvchEstacao", OperationConstants.DEFAULT_ESTACAO);
-                _parameters.Add("@pvchChvIdemPotencia", transaction.chaveIdempotencia);
                 _parameters.Add("@pvchMsgPixIN", transaction.getTransactionSerialization());
 
                 // Parâmetro de saída
@@ -220,7 +217,6 @@ namespace Adapters.Outbound.Database.SQL
                 _parameters.Add("@psmlAgencia", OperationConstants.DEFAULT_AGENCIA);
                 _parameters.Add("@ptinPosto", OperationConstants.DEFAULT_POSTO);
                 _parameters.Add("@pvchEstacao", OperationConstants.DEFAULT_ESTACAO);
-                _parameters.Add("@pvchChvIdemPotencia", transaction.chaveIdempotencia);
                 _parameters.Add("@pvchMsgPixIN", transaction.getTransactionSerialization());
 
                 // Parâmetro de saída

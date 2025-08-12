@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Domain.Core.Common.Base;
+using Domain.Core.Constant;
 using Domain.Core.Ports.Outbound;
 using Domain.Core.Settings;
 using Microsoft.Data.SqlClient;
@@ -20,9 +21,8 @@ namespace Adapters.Outbound.Database.SQL
         private readonly AsyncRetryPolicy<IDbConnection> _retryPolicy;
         private DbConnection _connection;
         private readonly SemaphoreSlim _semaphore;
-        private const int MaxRetries = 3;
+        private const int MaxRetries = 10;
         private string _CorrelationId;
-
 
         public SQLConnectionAdapter(IServiceProvider serviceProvider) : base(serviceProvider)
         {
@@ -38,6 +38,9 @@ namespace Adapters.Outbound.Database.SQL
         }
 
         public string GetServer() => _settings.Value?.ServerUrl ?? throw new InvalidOperationException("Server não configurado");
+
+        public ConnectionState GetConnectionState() => _connection == null? ConnectionState.Closed: _connection.State;
+
 
         public async Task CloseConnectionAsync()
         {
@@ -72,6 +75,7 @@ namespace Adapters.Outbound.Database.SQL
             finally
             {
                 _connection = null;
+                OperationConstants.CONNECTIONS_ACTIVE = (OperationConstants.CONNECTIONS_ACTIVE== 0 ? 0 : OperationConstants.CONNECTIONS_ACTIVE - 1);
                 _semaphore.Release();
             }
         }
@@ -101,6 +105,7 @@ namespace Adapters.Outbound.Database.SQL
                             await _newConnection.OpenAsync(cancellationToken);
                             _connection = _newConnection;
                             _loggingAdapter.LogDebug("Database connection opened successfully");
+                            OperationConstants.CONNECTIONS_ACTIVE =OperationConstants.CONNECTIONS_ACTIVE + 1;
                         }
                         catch (Exception ex)
                         {
@@ -200,10 +205,15 @@ namespace Adapters.Outbound.Database.SQL
 
         private async Task EnsureConnectionClosedAsync()
         {
-            if (_connection == null) return;
+            if (_connection == null)
+            {
+                return;
+            }
 
             var connectionToDispose = _connection;
             _connection = null;
+            OperationConstants.CONNECTIONS_ACTIVE = OperationConstants.CONNECTIONS_ACTIVE ==0 ?0: OperationConstants.CONNECTIONS_ACTIVE - 1;
+            OperationConstants.CONNECTIONS_CLOSED = OperationConstants.CONNECTIONS_CLOSED > 10000?0: OperationConstants.CONNECTIONS_CLOSED + 1;
             await DisposeConnectionAsync(connectionToDispose);
         }
 

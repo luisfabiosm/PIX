@@ -64,9 +64,7 @@ public static class JsonExtensions
 
         options ??= JsonOptions.Default;
 
-        // ✅ CORREÇÃO: Usar diretamente ReadOnlySpan<byte> com Encoding.UTF8
-        var utf8Json = Encoding.UTF8.GetBytes(json);
-        return JsonSerializer.Deserialize<T>(utf8Json, options);
+        return JsonSerializer.Deserialize<T>(json, options);
     }
 
     /// <summary>
@@ -299,27 +297,7 @@ public static class JsonExtensions
         return Encoding.UTF8.GetString(bufferWriter.WrittenSpan);
     }
 
-    /// <summary>
-    /// Versão otimizada para retornar bytes diretamente com ArrayBufferWriter.
-    /// </summary>
-    /// <typeparam name="T">Tipo do objeto</typeparam>
-    /// <param name="value">Objeto a ser serializado</param>
-    /// <param name="options">Opções de serialização</param>
-    /// <returns>Bytes UTF8 do JSON</returns>
-    public static byte[] ToJsonBytesHighPerformance<T>(this T value, JsonSerializerOptions? options = null)
-    {
-        if (value == null) return "null"u8.ToArray();
-
-        options ??= JsonOptions.Default;
-
-        var bufferWriter = new ArrayBufferWriter<byte>(EstimateBufferSize<T>());
-
-        using var writer = new Utf8JsonWriter(bufferWriter);
-        JsonSerializer.Serialize(writer, value, options);
-        writer.Flush();
-
-        return bufferWriter.WrittenSpan.ToArray();
-    }
+ 
 
 
 }

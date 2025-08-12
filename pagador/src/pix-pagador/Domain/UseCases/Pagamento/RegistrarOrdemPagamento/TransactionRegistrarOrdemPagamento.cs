@@ -11,8 +11,8 @@ namespace Domain.UseCases.Pagamento.RegistrarOrdemPagamento
     {
         public string idReqSistemaCliente { get; init; }
         public EnumTpIniciacao tpIniciacao { get; init; }
-        public JDPIDadosContaPagador pagador { get; init; }
-        public JDPIDadosContaRecebedor recebedor { get; init; }
+        public JDPIDadosConta pagador { get; init; }
+        public JDPIDadosConta recebedor { get; init; }
         public double valor { get; init; }
         public string chave { get; init; }
         public string dtEnvioPag { get; init; }

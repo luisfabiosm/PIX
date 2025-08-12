@@ -15,7 +15,7 @@ namespace Domain.UseCases.Pagamento.CancelarOrdemPagamento
 
         protected override async Task<ValidationResult> ExecuteSpecificValidations(TransactionCancelarOrdemPagamento transaction, CancellationToken cancellationToken)
         {
-            var errors = new List<ErrorDetails>();
+            var errors = new List<ValidationErrorDetails>();
 
             var clienteValidation = _validateService.ValidarIdReqSistemaCliente(transaction.idReqSistemaCliente);
             if (!clienteValidation.IsValid)
@@ -59,12 +59,12 @@ namespace Domain.UseCases.Pagamento.CancelarOrdemPagamento
             );
         }
 
-
-
         protected override BaseReturn<JDPICancelarOrdemPagamentoResponse> ReturnErrorResponse(Exception exception, string correlationId)
         {
             return BaseReturn<JDPICancelarOrdemPagamentoResponse>.FromException(exception, correlationId);
         }
+
+
 
     }
 }

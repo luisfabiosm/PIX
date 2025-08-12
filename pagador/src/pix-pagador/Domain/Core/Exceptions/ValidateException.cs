@@ -5,28 +5,25 @@
     {
         public int ErrorCode { get; internal set; } = -1;
 
-        public List<ErrorDetails> erros { get; private set; }
+        public List<ValidationErrorDetails> RequestErrors { get; private set; }
 
         public ValidateException()
         {
 
         }
-        public void AddDetails(ErrorDetails details)
+    
+        public ValidateException(string message) : base(message)
         {
-            this.erros.Add(details);
+            
         }
 
-        public ValidateException(string message)
-            : base(message)
-        {
-            this.erros = new List<ErrorDetails>();
-        }
 
-        public ValidateException(string message, int errorCode, object details)
-           : base(message)
+        public static ValidateException Create(List<ValidationErrorDetails> details)
         {
-            this.ErrorCode = errorCode == -1 ? 400 : errorCode;
-            erros = (List<ErrorDetails>)details;
+            var errorMessage = $"Validação falhou com {details.Count} erro(s)";
+            var _exception = new ValidateException(errorMessage);
+            _exception.RequestErrors = details;
+            return _exception;
         }
 
     }

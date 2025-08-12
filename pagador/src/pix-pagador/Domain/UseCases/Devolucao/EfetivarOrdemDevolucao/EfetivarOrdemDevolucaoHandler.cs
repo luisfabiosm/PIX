@@ -17,7 +17,7 @@ namespace Domain.UseCases.Devolucao.EfetivarOrdemDevolucao
 
         protected override async Task<ValidationResult> ExecuteSpecificValidations(TransactionEfetivarOrdemDevolucao transaction, CancellationToken cancellationToken)
         {
-            var errors = new List<ErrorDetails>();
+            var errors = new List<ValidationErrorDetails>();
 
             // Validação de idReqSistemaCliente
             var clienteValidation = _validateService.ValidarIdReqSistemaCliente(transaction.idReqSistemaCliente);

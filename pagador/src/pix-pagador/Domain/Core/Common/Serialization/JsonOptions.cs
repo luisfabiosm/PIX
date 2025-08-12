@@ -29,6 +29,8 @@ public static class JsonOptions
 
         // Configurações de Encoding
         Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+        
+
 
         // Configurações de Parsing
         AllowTrailingCommas = true,
@@ -48,6 +50,7 @@ public static class JsonOptions
 
         // Configurações de buffer
         DefaultBufferSize = 16 * 1024, // 16KB buffer otimizado
+
     };
 
     /// <summary>
