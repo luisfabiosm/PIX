@@ -9,13 +9,13 @@ namespace Domain.Services
     {
 
 
-        public (List<ErrorDetails> Errors, bool IsValid) ValidarPagador(JDPIDadosContaPagador pagador)
+        public (List<ValidationErrorDetails> Errors, bool IsValid) ValidarPagador(JDPIDadosConta pagador)
         {
-            var _errors = new List<ErrorDetails>();
+            var _errors = new List<ValidationErrorDetails>();
 
             if (pagador is null)
             {
-                _errors.Add(new ErrorDetails("pagador", "pagador deve ser preenchido"));
+                _errors.Add(new ValidationErrorDetails("pagador", "pagador deve ser preenchido"));
                 return (_errors, false);
             }
 
@@ -30,13 +30,13 @@ namespace Domain.Services
         }
 
 
-        public (List<ErrorDetails> Errors, bool IsValid) ValidarRecebedor(JDPIDadosContaRecebedor recebedor)
+        public (List<ValidationErrorDetails> Errors, bool IsValid) ValidarRecebedor(JDPIDadosConta recebedor)
         {
-            var errors = new List<ErrorDetails>();
+            var errors = new List<ValidationErrorDetails>();
 
             if (recebedor is null)
             {
-                errors.Add(new ErrorDetails("recebedor", "recebedor deve ser preenchido"));
+                errors.Add(new ValidationErrorDetails("recebedor", "recebedor deve ser preenchido"));
                 return (errors, false);
             }
 
@@ -50,9 +50,9 @@ namespace Domain.Services
         }
 
 
-        public (List<ErrorDetails> Errors, bool IsValid) ValidardtHrOp(string dtHrOp)
+        public (List<ValidationErrorDetails> Errors, bool IsValid) ValidardtHrOp(string dtHrOp)
         {
-            var errors = new List<ErrorDetails>();
+            var errors = new List<ValidationErrorDetails>();
 
             ValidateRequired(dtHrOp, "dtHrOp", errors);
 
@@ -60,18 +60,18 @@ namespace Domain.Services
         }
 
 
-        public (List<ErrorDetails> Errors, bool IsValid) ValidarValor(double valor)
+        public (List<ValidationErrorDetails> Errors, bool IsValid) ValidarValor(double valor)
         {
-            var errors = new List<ErrorDetails>();
+            var errors = new List<ValidationErrorDetails>();
 
             ValidateRequired(valor, "valor", errors);
 
             return (errors, errors.Count == 0);
         }
 
-        public (List<ErrorDetails> Errors, bool IsValid) ValidarValorDevolucao(double valor)
+        public (List<ValidationErrorDetails> Errors, bool IsValid) ValidarValorDevolucao(double valor)
         {
-            var errors = new List<ErrorDetails>();
+            var errors = new List<ValidationErrorDetails>();
 
             ValidateRequired(valor, "valor", errors);
 
@@ -79,9 +79,9 @@ namespace Domain.Services
         }
 
 
-        public (List<ErrorDetails> Errors, bool IsValid) ValidarChaveIdempotencia(string chaveIdempotencia)
+        public (List<ValidationErrorDetails> Errors, bool IsValid) ValidarChaveIdempotencia(string chaveIdempotencia)
         {
-            var errors = new List<ErrorDetails>();
+            var errors = new List<ValidationErrorDetails>();
 
             ValidateRequired(chaveIdempotencia, "chaveIdempotencia", errors);
 
@@ -89,18 +89,18 @@ namespace Domain.Services
         }
 
 
-        public (List<ErrorDetails> Errors, bool IsValid) ValidarEndToEndIdOriginal(string endToEndIdOriginal)
+        public (List<ValidationErrorDetails> Errors, bool IsValid) ValidarEndToEndIdOriginal(string endToEndIdOriginal)
         {
-            var errors = new List<ErrorDetails>();
+            var errors = new List<ValidationErrorDetails>();
 
             ValidateRequired(endToEndIdOriginal, "endToEndIdOriginal", errors);
 
             return (errors, errors.Count == 0);
         }
 
-        public (List<ErrorDetails> Errors, bool IsValid) ValidarEndToEndId(string endToEndId)
+        public (List<ValidationErrorDetails> Errors, bool IsValid) ValidarEndToEndId(string endToEndId)
         {
-            var errors = new List<ErrorDetails>();
+            var errors = new List<ValidationErrorDetails>();
 
             ValidateRequired(endToEndId, "endToEndId", errors);
 
@@ -108,9 +108,9 @@ namespace Domain.Services
         }
 
 
-        public (List<ErrorDetails> Errors, bool IsValid) ValidarCodigoDevolucao(string codigoDevolucao)
+        public (List<ValidationErrorDetails> Errors, bool IsValid) ValidarCodigoDevolucao(string codigoDevolucao)
         {
-            var errors = new List<ErrorDetails>();
+            var errors = new List<ValidationErrorDetails>();
 
             ValidateRequired(codigoDevolucao, "codigoDevolucao", errors);
 
@@ -118,9 +118,9 @@ namespace Domain.Services
         }
 
 
-        public (List<ErrorDetails> Errors, bool IsValid) ValidarIdReqSistemaCliente(string idReqSistemaCliente)
+        public (List<ValidationErrorDetails> Errors, bool IsValid) ValidarIdReqSistemaCliente(string idReqSistemaCliente)
         {
-            var errors = new List<ErrorDetails>();
+            var errors = new List<ValidationErrorDetails>();
 
             ValidateRequired(idReqSistemaCliente, "idReqSistemaCliente", errors);
 
@@ -128,9 +128,9 @@ namespace Domain.Services
         }
 
 
-        public (List<ErrorDetails> Errors, bool IsValid) ValidarTpIniciacao(EnumTpIniciacao tpIniciacao)
+        public (List<ValidationErrorDetails> Errors, bool IsValid) ValidarTpIniciacao(EnumTpIniciacao tpIniciacao)
         {
-            var errors = new List<ErrorDetails>();
+            var errors = new List<ValidationErrorDetails>();
 
             ValidateRequired(tpIniciacao, "tpIniciacao", errors);
 
@@ -140,18 +140,18 @@ namespace Domain.Services
         }
 
 
-        public (List<ErrorDetails> Errors, bool IsValid) ValidarMotivo(string motivo)
+        public (List<ValidationErrorDetails> Errors, bool IsValid) ValidarMotivo(string motivo)
         {
-            var errors = new List<ErrorDetails>();
+            var errors = new List<ValidationErrorDetails>();
 
             ValidateRequired(motivo, "motivo", errors);
 
             return (errors, errors.Count == 0);
         }
 
-        public (List<ErrorDetails> Errors, bool IsValid) ValidarPrioridadePagamento(EnumPrioridadePagamento? prioridadePagamento)
+        public (List<ValidationErrorDetails> Errors, bool IsValid) ValidarPrioridadePagamento(EnumPrioridadePagamento? prioridadePagamento)
         {
-            var errors = new List<ErrorDetails>();
+            var errors = new List<ValidationErrorDetails>();
 
             ValidateRequired(prioridadePagamento, "prioridadePagamento", errors);
 
@@ -161,9 +161,9 @@ namespace Domain.Services
         }
 
 
-        public (List<ErrorDetails> Errors, bool IsValid) ValidarTipoPrioridadePagamento(EnumTpPrioridadePagamento? tpPrioridadePagamento)
+        public (List<ValidationErrorDetails> Errors, bool IsValid) ValidarTipoPrioridadePagamento(EnumTpPrioridadePagamento? tpPrioridadePagamento)
         {
-            var errors = new List<ErrorDetails>();
+            var errors = new List<ValidationErrorDetails>();
 
             ValidateRequired(tpPrioridadePagamento, "tpPrioridadePagamento", errors);
 
@@ -172,9 +172,9 @@ namespace Domain.Services
             return (errors, errors.Count == 0);
         }
 
-        public (List<ErrorDetails> Errors, bool IsValid) ValidarFinalidade(EnumTipoFinalidade? finalidade)
+        public (List<ValidationErrorDetails> Errors, bool IsValid) ValidarFinalidade(EnumTipoFinalidade? finalidade)
         {
-            var errors = new List<ErrorDetails>();
+            var errors = new List<ValidationErrorDetails>();
 
             ValidateRequired(finalidade, "finalidade", errors);
 
@@ -185,23 +185,23 @@ namespace Domain.Services
 
 
 
-        private void ValidateRequired<T>(T value, string fieldName, List<ErrorDetails> errors)
+        private void ValidateRequired<T>(T value, string fieldName, List<ValidationErrorDetails> errors)
         {
             if (value == null || value.Equals(default(T)) || (value is string s && string.IsNullOrWhiteSpace(s)))
             {
-                errors.Add(new ErrorDetails(fieldName, $"{fieldName} deve ser informado e nao pode ser nulo"));
+                errors.Add(new ValidationErrorDetails(fieldName, $"{fieldName} deve ser informado e nao pode ser nulo"));
             }
         }
 
-        private void ValidateEnum(object value, Type enumType, string fieldName, List<ErrorDetails> errors)
+        private void ValidateEnum(object value, Type enumType, string fieldName, List<ValidationErrorDetails> errors)
         {
             if (value == null)
             {
-                errors.Add(new ErrorDetails(fieldName, $"{fieldName} deve ser informado e nao pode ser nulo"));
+                errors.Add(new ValidationErrorDetails(fieldName, $"{fieldName} deve ser informado e nao pode ser nulo"));
             }
             else if (!Enum.IsDefined(enumType, value))
             {
-                errors.Add(new ErrorDetails(fieldName, $"{fieldName} deve ser preenchido com domínio válido"));
+                errors.Add(new ValidationErrorDetails(fieldName, $"{fieldName} deve ser preenchido com domínio válido"));
             }
         }
 

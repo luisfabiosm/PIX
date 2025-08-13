@@ -74,7 +74,7 @@ namespace Adapters.Inbound.WebApi.Extensions
             }
 
             app.UseHttpsRedirection();
-            app.UseResultResponseMiddleware();
+            app.UseHandleResponseResultMiddleware();
             app.AddOrdemPagamentoEndpoints();
             app.AddDevolucaoEndpoints();
             app.UseAuthentication();

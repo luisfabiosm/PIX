@@ -14,7 +14,7 @@ namespace Domain.UseCases.Devolucao.RegistrarOrdemDevolucao
 
         protected override async Task<ValidationResult> ExecuteSpecificValidations(TransactionRegistrarOrdemDevolucao transaction, CancellationToken cancellationToken)
         {
-            var errors = new List<ErrorDetails>();
+            var errors = new List<ValidationErrorDetails>();
 
             // Validação de idReqSistemaCliente
             var clienteValidation = _validateService.ValidarIdReqSistemaCliente(transaction.idReqSistemaCliente);
@@ -74,5 +74,6 @@ namespace Domain.UseCases.Devolucao.RegistrarOrdemDevolucao
             return BaseReturn<JDPIRegistrarOrdemDevolucaoResponse>.FromException(exception, correlationId);
         }
 
+       
     }
 }

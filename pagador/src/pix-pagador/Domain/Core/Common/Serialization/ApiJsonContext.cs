@@ -62,8 +62,7 @@ namespace Domain.Core.Common.Serialization;
 [JsonSerializable(typeof(JDPIEfetivarOrdemDevolucaoResponse))]
 
 // JDPI Models
-[JsonSerializable(typeof(JDPIDadosContaPagador))]
-[JsonSerializable(typeof(JDPIDadosContaRecebedor))]
+[JsonSerializable(typeof(JDPIDadosConta))]
 [JsonSerializable(typeof(JDPIValorDetalhe))]
 [JsonSerializable(typeof(List<JDPIValorDetalhe>))]
 
@@ -90,9 +89,15 @@ namespace Domain.Core.Common.Serialization;
 [JsonSerializable(typeof(decimal))]
 [JsonSerializable(typeof(bool))]
 [JsonSerializable(typeof(DateTime))]
+[JsonSerializable(typeof(object))]
+
 
 //Error
-[JsonSerializable(typeof(SpsErroReturn))]
+[JsonSerializable(typeof(ErrorDetailsReturn))]
+[JsonSerializable(typeof(ValidationErrorDetails))]
+[JsonSerializable(typeof(List<ValidationErrorDetails>))]
+
+
 
 // Collections
 [JsonSerializable(typeof(List<string>))]

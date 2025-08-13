@@ -13,7 +13,7 @@ public class RegistrarOrdemPagamentoHandler : BSUseCaseHandler<TransactionRegist
 
     protected override async Task<ValidationResult> ExecuteSpecificValidations(TransactionRegistrarOrdemPagamento transaction, CancellationToken cancellationToken)
     {
-        var errors = new List<ErrorDetails>();
+        var errors = new List<ValidationErrorDetails>();
 
         // Validação de idReqSistemaCliente
         var clienteValidation = _validateService.ValidarIdReqSistemaCliente(transaction.idReqSistemaCliente);
@@ -29,7 +29,7 @@ public class RegistrarOrdemPagamentoHandler : BSUseCaseHandler<TransactionRegist
         }
         else
         {
-            errors.Add(new ErrorDetails("pagador", "Dados do pagador são obrigatórios"));
+            errors.Add(new ValidationErrorDetails("pagador", "Dados do pagador são obrigatórios"));
         }
 
         // Validação de recebedor
@@ -41,7 +41,7 @@ public class RegistrarOrdemPagamentoHandler : BSUseCaseHandler<TransactionRegist
         }
         else
         {
-            errors.Add(new ErrorDetails("recebedor", "Dados do recebedor são obrigatórios"));
+            errors.Add(new ValidationErrorDetails("recebedor", "Dados do recebedor são obrigatórios"));
         }
 
         // Validação de valor
@@ -72,6 +72,8 @@ public class RegistrarOrdemPagamentoHandler : BSUseCaseHandler<TransactionRegist
         {
             var result = await _spaRepoSql.RegistrarOrdemPagamento(transaction);
             return new JDPIRegistrarOrdemPagamentoResponse(await HandleProcessingResult(result));
+
+
         }
         catch (BusinessException bex)
         {
@@ -101,7 +103,6 @@ public class RegistrarOrdemPagamentoHandler : BSUseCaseHandler<TransactionRegist
 
         return BaseReturn<JDPIRegistrarOrdemPagamentoResponse>.FromException(exception, correlationId);
     }
-
 
 }
 

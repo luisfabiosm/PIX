@@ -8,8 +8,8 @@ namespace Domain.Core.Models.Request
 
         public string idReqSistemaCliente { get; set; }
         public EnumTpIniciacao tpIniciacao { get; set; }
-        public JDPIDadosContaPagador pagador { get; set; }
-        public JDPIDadosContaRecebedor recebedor { get; set; }
+        public JDPIDadosConta pagador { get; set; }
+        public JDPIDadosConta recebedor { get; set; }
         public double valor { get; set; }
         public string chave { get; set; }
         public string dtEnvioPag { get; set; }

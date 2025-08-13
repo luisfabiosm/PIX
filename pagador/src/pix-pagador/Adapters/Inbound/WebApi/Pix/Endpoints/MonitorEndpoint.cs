@@ -1,4 +1,7 @@
-﻿using System.Diagnostics;
+﻿using Adapters.Outbound.Database.SQL;
+using Domain.Core.Constant;
+using Domain.Core.Ports.Outbound;
+using System.Diagnostics;
 
 namespace Adapters.Inbound.WebApi.Pix.Endpoints
 {
@@ -13,7 +16,7 @@ namespace Adapters.Inbound.WebApi.Pix.Endpoints
 
 
             monitoringGroup.MapGet("/health/detailed", async (
-            IServiceProvider serviceProvider) =>
+            IServiceProvider serviceProvider, ISQLConnectionAdapter _dbConnection) =>
                     {
                         var checks = new Dictionary<string, object>
                         {
@@ -21,7 +24,11 @@ namespace Adapters.Inbound.WebApi.Pix.Endpoints
                             ["version"] = "2.0.0",
                             ["environment"] = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"),
                             ["machineName"] = Environment.MachineName,
-                            ["processId"] = Environment.ProcessId
+                            ["processId"] = Environment.ProcessId,
+                            ["SQLConnectionState"] = _dbConnection.GetConnectionState() ,//OperationConstants.CONNECTION_STATE,
+                            ["SQLTotalConnectionsOn"] = OperationConstants.CONNECTIONS_ACTIVE,
+                            ["SQLTotalConnectionsClosed"] = OperationConstants.CONNECTIONS_CLOSED
+
                         };
 
                         // Adicionar checks específicos se necessário

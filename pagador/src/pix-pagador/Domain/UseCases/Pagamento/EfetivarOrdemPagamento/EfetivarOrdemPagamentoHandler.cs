@@ -16,7 +16,7 @@ namespace Domain.UseCases.Pagamento.EfetivarOrdemPagamento
 
         protected override async Task<ValidationResult> ExecuteSpecificValidations(TransactionEfetivarOrdemPagamento transaction, CancellationToken cancellationToken)
         {
-            var errors = new List<ErrorDetails>();
+            var errors = new List<ValidationErrorDetails>();
 
             var clienteValidation = _validateService.ValidarIdReqSistemaCliente(transaction.idReqSistemaCliente);
             if (!clienteValidation.IsValid)
@@ -64,6 +64,5 @@ namespace Domain.UseCases.Pagamento.EfetivarOrdemPagamento
         {
             return BaseReturn<JDPIEfetivarOrdemPagamentoResponse>.FromException(exception, correlationId);
         }
-
     }
 }
